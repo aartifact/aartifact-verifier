@@ -24,37 +24,56 @@ module IOPrintFormat where
 type OutputFormat = [String -> String]
 
 noneOutFmt :: OutputFormat
-noneOutFmt = [id,id,id,id,id]
+noneOutFmt = [id,id,id,id,id,id]
 
 ansiOutFmt :: OutputFormat
 ansiOutFmt =
   [ id
+  , id
   , \s-> "\ESC[32m"++s
   , \s-> s++"\ESC[0m"
   , \s-> "\ESC[36m"++s++"\ESC[0m"
   , \s-> "\ESC[31m"++s++"\ESC[0m"
   ]
 
+cmdHtmlOutFmt :: OutputFormat
+cmdHtmlOutFmt =
+  let (ou:fs) = htmlOutFmt
+      ou' = 
+       (let pr s = case s of
+                    ('\n':cs) -> "\n"++pr cs
+                    (c:cs) -> c:pr cs
+                    [] -> []
+        in pr)
+  in (ou':fs)
+
 htmlOutFmt :: OutputFormat
 htmlOutFmt =
   [ (let pr s = case s of
+          ('\n':cs) -> "\n<br />"++pr cs
+          (c:cs) -> c:pr cs
+          [] -> []
+     in (\s -> "<code>"++pr s++"</code>")
+    ),
+    (let pr s = case s of
           ('\n':' ':cs) -> "\n&nbsp;"++pr cs
           (' ':' ':cs) -> "&nbsp; "++pr cs
           (c:cs) -> c:pr cs
           [] -> []
      in pr -- Fix &nbsp; entities.
     )
-  , \s-> "<font color=\"lightsteelblue\">"++s
+  , \s-> "<font color=\"#B0C4DE\">"++s --lightsteelblue
   , \s-> s++"</font>"
-  , \s-> "<font color=\"cornflowerblue\">"++s++"</font>"
-  , \s-> "<font color=\"firebrick\"><b>"++s++"</b></font>" -- #C82626
+  , \s-> "<font color=\"#6495ED\">"++s++"</font>" --cornflowerblue
+  , \s-> "<font color=\"#B22222\"><b>"++s++"</b></font>" -- firebrick,#C82626
   ]
 
-fmt [sp,_,_,_,_] "string" s = sp s
-fmt [_,li,_,_,_] "ignore-left" s = li s
-fmt [_,_,ri,_,_] "ignore-right" s = ri s
-fmt [_,li,ri,_,_] "ignore" s = li (ri s)
-fmt [_,_,_,va,_] "valid" s = va s
-fmt [_,_,_,_,inv] "invalid" s = inv s
+fmt [ou,_,_,_,_,_] "output" s = ou s
+fmt [_,sp,_,_,_,_] "string" s = sp s
+fmt [_,_,li,_,_,_] "ignore-left" s = li s
+fmt [_,_,_,ri,_,_] "ignore-right" s = ri s
+fmt [_,_,li,ri,_,_] "ignore" s = li (ri s)
+fmt [_,_,_,_,va,_] "valid" s = va s
+fmt [_,_,_,_,_,inv] "invalid" s = inv s
 
 --eof
