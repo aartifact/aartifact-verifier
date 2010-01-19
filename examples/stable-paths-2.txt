@@ -1,0 +1,236 @@
+Vectors are natively supported. Vector expressions are comma-separated tuples, the length of a vector $v$ is expressed as $|v|$, and the $i$th element of a vector is denoted $v_i$. Both $(\ldots)$ and $\langle \ldots \rangle$ notations are supported and are treated as equivalent.
+
+It is necessary to be careful when dealing with vectors with a single element. Simply putting parentheses around an expression will <i>not</i> allow the parser to disambiguate whether the user wishes to define a vector or simply to group operations, so the latter interpretation will be used by default in all such cases. In situations where a vector with a single element is desired, users can employ the $\langle \ldots \rangle$ notation without ambiguity, as it always denotes a vector.
+
+== Dependencies ==
+
+\vinclude[[Natural]]
+
+== Assumptions ==
+
+=== Prefixes and suffixes ===
+\vbeg
+
+Assume for any $S$, for any $n \in \N$, for any $w \in S^n$, \p{$w$ is a vector}.
+
+Assume for any $v,w$, \p{$v$ is a prefix of $w$} iff {$|w| \geq |v|$ and for all $i \in \{0,\ldots,|v|-1\}$, $v_i = w_i$}.
+
+Assume for any $v,w$, \p{$v$ is a suffix of $w$} iff {$|w| \geq |v|$ and for all $i \in \{0,\ldots,|v|-1\}$, $i \geq 0$ and $v_i = w_{|w|-|v|+i}$}.
+
+\vend
+
+
+
+=== Sorting ===
+\vbeg
+
+Assume for any $v$, \p{$v$ is sorted} iff $|v| \leq 1$ or for all $i \in \{0,\ldots,|v|-2\}$, $v_i \leq v_{i+1}$.
+
+\vend
+
+== Examples ==
+
+=== Vectors ===
+
+\vbeg
+
+Assert $(1,2,3)_2 = 3$.
+
+Assert $\langle 99 \rangle_0 = 99$.
+
+\vend
+
+=== Strings ===
+
+\vbeg
+
+Assert \p{$(1,2)$ is a prefix of $(1,2,3)$} and \p{$(2,3)$ is a suffix of $(1,2,3)$}.
+
+Assert \p{$(1,2,3,3,4)$ is sorted}.
+
+\vend
+The Kleene operator on sets is supported natively. Vectors are the preferred and supported method for representing strings. The operator $\circ$ is overloaded to represent concatenation on strings.
+\vbeg
+
+Introduce $\Sigma$: assume $\Sigma = \{0,1\}$.
+
+Assert $(1,0,1,1,0) \in \Sigma^\ast$.
+
+Assert $(1,0,1,1,0) \circ (1,0,1,1,0) \circ \langle 1 \rangle \in \Sigma^\ast$.
+
+\vend
+
+
+
+
+
+
+
+Graphs can be represented using sets.
+
+== Dependencies ==
+
+\vinclude[[Vector]]
+\vinclude[[Set]]
+
+== Assumptions ==
+
+\vbeg
+Assume for any $V,E$, \p{$(V,E)$ is a directed graph} iff $E \subset V \times V$.
+
+Assume for any $E, V, p$, \p{$p$ is a path in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph} and
+::{{$|p| = 1$ and $p_0 \in V$} or 
+::$p \in E$ or 
+::{for all $i \in \{0,\ldots,|p| - 2\}$, $(p_i, p_{i+1}) \in E$}}.
+
+Assume for any $E, V, p,v,v'$, \p{$p$ is a path from $v$ to $v'$ in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph}, \p{$p$ is a path in $(V, E)$}, $p_{0} = v$, and $p_{|p|-1} = v'$.
+
+Assume for any $E, V, p$, \p{$p$ is an acyclic path in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph}, \p{$p$ is a path in $(V, E)$} and
+:for all $i, j  \in \{0,\ldots,|p|-1\}$, $i \neq j$ implies $p_i \neq p_j$.
+
+Assume for any $E, V, p$, \p{$p$ is a Hamiltonian path for $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph}, \p{$p$ is an acyclic path in $(V, E)$}, $|p| = |V|$, and 
+:for all $v \in V$,
+::there exists $j \in \{0,\ldots,|p|-1\}$ s.t. $v = p_j$.
+
+Assume for any $E,V,w$, if \p{$(V,E)$ is a directed graph} and for all $e \in E$, $w(e) \in \R$ then \p{$(V,E,w)$ is a weighted directed graph}.
+
+\vend
+
+== Examples ==
+
+\vbeg
+
+Introduce $V, E$.
+
+Assume $V = \{1,2,3\}$ and $E = \{(1,2), (2,3)\}$.
+
+Assert \p{$(V, E)$ is a directed graph}.
+
+Assert \p{$(1,2,3)$ is a path in $(V, E)$}.
+
+Assert \p{$(1,2,3)$ is an acyclic path in $(V, E)$}.
+
+Assert \p{$(1,2,3)$ is a Hamiltonian path for $(V,E)$}.
+
+\vend
+
+
+
+
+
+
+
+
+
+
+
+
+We model a restricted variant of the stable paths problem.
+
+== Dependencies ==
+
+\vinclude[[Graph]]
+
+== Assumptions ==
+\vbeg
+
+Assume for any $E,V,d,C$, if \p{$(V,E)$ is a directed graph} and $d \in V$ then
+:\p{$C$ is a configuration for $((V,E),d)$} iff
+:for all $v \in V$,
+::$v = d$ or
+::\p{$C_v$ is a path from $v$ to $d$ in $(V,E)$} and {$|C_v| = 2$ or \p{$C_{(C_v)_1}$ is a suffix of $C_v$}}.
+
+Introduce $weight$: assume for any $w,p,type$, $weight_{w,type} (p) = \sum_{i = 0}^{|p|-2} {w_{type}}(p_i,p_{i+1})$.
+
+Assume for any $V,E,w,t,C,d$, \p{$C$ is a stable configuration for $((V,E),d,w,t)$} iff
+:\p{$C$ is a configuration for $((V,E),d)$} and
+:for all $v \in V$, for all $e \in E$,
+::if $e_0 = v$ and $v \neq d$ then $weight_{w,t(v)} (C_{v}) \leq w_{t(v)} (e) + weight_{w,t(v)} (C_{e_1})$.
+
+\vend
+== Example ==
+
+We now construct an example of a stable configuration for the following small graph, in which $0$ will be our root node.
+\vbeg
+Introduce $V,E$: assume $V = \{0,1,2\}$ and $E = \{(0,0), (1,0), (2,0), (1,2), (2,1)\}$.
+\vend
+
+This graph has three nodes, and each will be either of type $A$, or type $B$. We assign $A$ and $B$ to constants so that the evaluation algorithm will be able to treat them as constants, and then we define a function $t$ that returns the type of a node.
+\vbeg
+Introduce $A,B$: assume $A = 1$, $B = 2$.
+
+Introduce $t$: assume $t(1) = A$ and $t(2) = B$.
+\vend
+
+We now define the weight function for the graph, as well as how weights over paths are computed.
+\vbeg
+Introduce $w$:
+:assume $w_A(0,0) = 0$, $w_A(1,0) = 20$, $w_A(2,0) = 10$, $w_A(1,2) = 1$, $w_A(2,1) = 1$.
+:assume $w_B(0,0) = 0$, $w_B(1,0) = 10$, $w_B(2,0) = 20$, $w_B(1,2) = 1$, $w_B(2,1) = 1$.
+
+\vend
+We can now construct a configuration.
+\vbeg
+Introduce $C$: assume $C = ((0,0), (1,0), (2,1,0))$.
+
+Assert \p{$C$ is a configuration for $((V,E),0)$}.
+\vend
+In fact, it is a stable configuration.
+\vbeg
+Assert \p{$C$ is a stable configuration for $((V,E),0,w,t)$}.
+\vend
+
+There are exactly two configurations, and we can determine this by first defining all possible paths of length $2$ or $3$, and then checking all possible configurations against the predicate that defines stability.
+
+\vbeg
+Introduce $Q$: assume $Q = \{x | (x \in \bigcup_{i=2}^{3} V^i), \p{$x$ is an acyclic path in $(V,E)$} \vee x = (0,0)\}$.
+
+Assert $|Q| = 7$.
+
+Assert $|\{C | C \in Q^3, (C_0)_0 = 0, (C_1)_0 = 1, (C_2)_0 = 2, \p{$C$ is a stable configuration for $((V,E),0,w,t)$}\}| = 2$.
+
+\vend
+
+== Another example ==
+
+\vbeg
+Introduce $V,E$: assume $V = \{0,1,2,3,4\}$ and $E = \{(0,0), (1,0), (2,0), (3,0), (4,0), (1,2), (2,3), (3,4), (4,1)\}$.
+
+Introduce $t$: assume $t(1) = A$, $t(2) = B$, $t(3) = A$, and $t(4) = B$.
+
+Introduce $w$: assume
+:$w_A(0,0) = 0$,
+:$w_A(1,0) = 3$, $w_A(2,0) = 1$, $w_A(3,0) = 3$, $w_A(4,0) = 1$, 
+:$w_A(1,2) = 1$, $w_A(2,3) = 1$, $w_A(3,4) = 1$, $w_A(4,1) = 1$,
+:$w_B(0,0) = 0$,
+:$w_B(1,0) = 1$, $w_B(2,0) = 6$, $w_B(3,0) = 6$, $w_B(4,0) = 3$, 
+:$w_B(1,2) = 1$, $w_B(2,3) = 1$, $w_B(3,4) = 1$, $w_B(4,1) = 1$.
+\vend
+
+We generate the list of all paths a bit more efficiently by defining a simple function $ext$ that allows us to extend a set of paths using a set of edges.
+
+\vbeg
+Introduce $ext$: assume
+:for any $P,E$,
+::$ext(P,E) = \{p \circ \langle e_1 \rangle | p \in P, e \in E, e_0 = p_{|p|-1}\}$
+
+Introduce $Q'$: assume $Q' = E \cup ext(E,E) \cup ext(ext(E,E), E) \cup ext(ext(ext(E,E), E), E)$.
+
+Introduce $Q$: assume $Q = \{x | x \in Q', x_{|x|-1} = 0, \p{$x$ is an acyclic path in $(V,E)$}\}$.
+
+Assert $|Q|=16$.
+
+Introduce $Q'$:
+:Assume for any $i$, $Q'(i) = \{x | x \in Q, x_0 = i\}$.
+
+Assert $|\{(0,0)\} \times Q'(1) \times Q'(2) \times Q'(3) \times Q'(4)| = 256$.
+
+
+
+Assert $|\{C | C \in \{(0,0)\} \times Q'(1) \times Q'(2) \times Q'(3) \times Q'(4) , \p{$C$ is a stable configuration for $((V,E),0,w,t)$}\}| = 0$.
+
+\vend

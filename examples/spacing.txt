@@ -1,0 +1,39 @@
+
+This is some text.
+
+\vbeg
+
+    Introduce
+    $x$. Introduce $n,m$.
+
+Introduce $z$.
+
+
+ Assume $a \in \R$,   $z \in \R$,    and    $a \in \R$
+   iff if
+              {
+              (   not   \p{test $a$}   )
+               } then ($2=a$).
+
+Assume $a$ is a test.
+
+Assume for all $a,b \in 1$,  $a = a$.
+Assume there exists $a,b \in g$ s.t. $a = a$ and $g = g$.
+
+Assume $x$ is a test. Assume $x \in \R$ and $c \in \R$ .
+
+  :Consider $2=2$.
+
+Assert $1=2$.
+
+\vend
+
+Assume $n \in \R$.
+Assume $n \geq 0$.
+Assert $n \geq 0$.
+
+\vbeg
+
+    Introduce
+    $x$.
+\vend

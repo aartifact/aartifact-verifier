@@ -1,0 +1,45 @@
+\vbeg
+
+
+
+Introduce $k$.
+Assume $k < 10$.
+Assert $k \leq 10$.
+
+Assert \l{$\R \cup \N \cup \emptyset$ is a set}.
+
+Introduce $x,y$.
+
+Assume \l{$x$ is even} and \l{$y$ is even}.
+
+Assume $x \leq y$.
+Assert $y \geq x$.
+
+Assert \l{$(x+y)+y$ is even}.
+
+Assert \l{$\Z \cup \Z$ is a set}.
+
+Assert \l{$1$ is odd}.
+
+Assume $x > 0$.
+Assert $0 \neq x$.
+
+Assert $x$ is non-zero.
+
+Introduce $U,V$.
+Assume \l{$U$ is a set}.
+Assert $\emptyset \subseteq U$.
+
+
+%-- Assume $\R \neq \R$.
+
+Assume \l{$1$ is even}, \l{$1$ is odd}.
+
+
+
+Assert \l{there is a contradiction}.
+
+%--Assume $\R < \N$.
+%--Assert $\R \leq \N$.
+
+\vend

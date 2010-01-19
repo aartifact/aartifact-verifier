@@ -1,0 +1,25 @@
+The main page cannot be edited by anonymous users, so the example on the main page is reproduced on this page for experimentation.
+\vbeg
+:Introduce $\sigma$.
+:Assume for any $n \in \N$,
+
+::$\sigma(n) = \sum_{d \in \{1,\ldots,n\} } d \cdot (\if n/d \in \Z \then 1 \else 0)$.
+
+:Assume for any $n \in \N$, if $\sigma(n) < 2 \cdot n$ then \p{$n$ is a deficient number}.
+:Assert \p{$101$ is a deficient number}.
+
+
+Assert for any $x$, if $x = x + 1$ then $1 + x = 1 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $2 + x = 2 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $3 + x = 3 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $4 + x = 4 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $5 + x = 5 + (x + 1)$
+
+Assert for any $x$, if $x = x + 1$ then $1 + x = 1 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $2 + x = 2 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $3 + x = 3 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $4 + x = 4 + (x + 1)$
+Assert for any $x$, if $x = x + 1$ then $5 + x = 5 + (x + 1)$
+
+
+\vend

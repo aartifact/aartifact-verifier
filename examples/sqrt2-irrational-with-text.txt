@@ -1,0 +1,35 @@
+We want to show that $\sqrt{2}$ is irrational. We will proceed by contradiction.
+
+== Dependencies ==
+\vinclude[[Rational]]
+
+== Argument ==
+
+\vbeg
+
+
+Assume that for any $q \in \Q$, there exist $n \in \Z, m \in \Z$ s.t. \p{$n$ and $m$ have no common factors}, $q = n/m$.
+
+Assume for any $x,y,z$, if $z = x/y$ then $y \cdot z = x$.
+
+Assume that $\sqrt{2} \in \Q$.
+
+Assert that there exist $n, m \in \Z$ s.t. \p{$n$ and $m$ have no common factors}, $\sqrt{2} = n/m$, if $m > 0$ then
+  $m \cdot \sqrt{2} = n$,
+:$(m \cdot \sqrt{2})^2 = n^2$,
+:$m^2 \cdot \sqrt{2}^2 = n^2$,
+:$m^2 \cdot 2 = n^2$,
+:$n^2 = m^2 \cdot 2$,
+:$n^2 = 2 \cdot m^2$,
+$n^2$ is even,
+$n$ is even. \vend
+
+Furthermore, there exists $k \in \Z$ s.t. $n = 2 \cdot k$,
+:$n^2 = (2 \cdot k)^2$,
+:$n^2 = 2^2 \cdot k^2$,
+:$n^2 = 4 \cdot k^2$,
+:$2 \cdot m^2 = 4 \cdot k^2$,
+:$m^2 = 2 \cdot k^2$,
+{there exists $j \in \Z$ s.t. $m^2 = 2 \cdot j$},
+\p{$m^2$ is even}, \p{$m$ is even}.
+Thus, \p{we have a contradiction}.

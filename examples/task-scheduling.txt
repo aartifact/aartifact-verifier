@@ -1,0 +1,10 @@
+\vbeg 
+
+Consider for any $f,X,Y$, if $f \in X$ and $f \in Y$ then $f \cup f \in X$
+
+
+
+Introduce $f,X,Y$.
+Assume $f \in X$, $f \in \R$.
+Assert $f \cup f \in X$
+\vend

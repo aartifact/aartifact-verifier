@@ -1,0 +1,77 @@
+\vbeg
+Introduce $n,m$.
+
+Assert for any $n \in \Z$, $(n ^ 2) \in \Z $
+Assert $2$ is even
+
+Assume $n \in \R$.
+Assume $n \geq 0$.
+
+
+Assert $\sqrt{n}^2 = n$.
+
+
+
+Assert $\sqrt{n} \in \R$.
+
+Assume $m \in \R$.
+
+Assume $m \leq n$, $n \leq m$.
+
+
+Assert $1 + m = 1 + n$.
+
+
+Assert $\N \subset \Q$.
+
+
+Consider for any $X,Y,Z$, if $Z = X \cup Y$ then $X \subseteq Z$ and $Y \subseteq Z$.
+
+
+Consider for any $M$, if $M$ is a map then $\ran(M)$ is a set.
+
+Consider for any $M$, if $M$ is a map then $\dom(M)$ is a set.
+
+Introduce $I$.
+Assert if $I$ is a set and $I = 2$ then $I$ is a set.
+
+Introduce $f$.
+Assume $f$ is a map.
+Assert $\dom(f)$ is a set.
+
+
+Assert for any $A,B$, if $A,B$ are sets then $A \subseteq {A \cup B}$.
+
+
+
+Assert for any $X$, if $X$ is a set then $X \subseteq X$.
+
+Assume $\nofix{+}$.
+
+Introduce $u,v$.
+Assume $u,v$ are sets.
+Assert $u$ is a set.
+
+Introduce arithmetic operator $hook$.
+
+Assert $1 hook 2$.
+
+\vend
+
+
+
+
+\vbeg
+Assume for any $X, Y$, \p{$X$ asd } iff $|X| = |Y|$.
+
+Assert that for any $x \in \Z$, $x \in \Q$.
+\vend
+
+
+
+
+
+
+
+
+for all $x,y$, $x \in \R$, $y \in \R$, $x \leq y$, $y \leq x$ implies \l{$x$ for $y$ is test}

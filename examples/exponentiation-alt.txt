@@ -1,0 +1,108 @@
+In the verifier, constant positive integer literals are by default members of the built-in constant $\N$. Furthermore, the binary operators (constants) for addition, multiplication, and exponentiation are assumed to produce values in $\N$ when applied to values in $\N$.
+
+== Assumptions ==
+
+=== Parity ===
+
+\vbeg
+Assume for any $n \in \N$, if \p{$n$ is even} then \p{$n+1$ is odd}.
+
+Assume for any $n \in \N$, if \p{$n$ is odd} then \p{$n+1$ is even}.
+
+Assume for any $n \in \N$, if \p{$n$ is even} then $n/2 \in \N$.
+
+Assume for any $n \in \N$, if \p{$n$ is odd} then $(n+1)/2 \in \N$.
+\vend
+
+=== Ordering under common operations ===
+
+\vbeg
+Assume for any $n \in \N$, $n/2 \leq n$.
+
+Assume for any $n \in \N$, $(n+1)/2 \leq n$.
+
+Assume for any $n,m \in \N$, if $n > 0$  and $m > 0$ then $n+m > 0$.
+
+\vend
+
+
+
+
+
+
+\vbeg
+Assert for any $m \in \N$, $1+m = m+1$.
+\vend
+
+
+
+
+
+
+
+We show by induction (using a strong induction hypothesis) that the more efficient $\log  n$ implementation of the exponentiation function is equivalent to the mathematical exponentiation function.
+
+== Dependencies ==
+
+\vinclude[[Natural]]
+
+== Argument ==
+
+\vbeg
+
+Define $pow$: assume for any $x \in \Z$,
+
+::$pow(x, 0) = 1$
+
+:and for any $n \in \N$, {$pow(x,n) \in \Z$} and
+
+::if $n > 0$ then
+
+:::{if \p{$n$ is odd} then $pow(x,n) = x \cdot pow(x,(n-1)/2) \cdot pow(x,(n-1)/2)$},
+
+:::{if \p{$n$ is even} then $pow(x,n) = pow(x,n/2) \cdot pow(x,n/2)$}.
+
+\vend
+The base case is trivial.\vbeg Assert for any $x \in \Z$, $pow(x, 0) = 1$, $pow(x, 0) = x^0$.
+\vend
+ 
+We first consider the case in which some $m$ is even.\vbeg
+
+Assert for any $x \in \Z, m \in \N$, if {for all $k \in \N$, $k \leq m$ implies that $pow(x,k) = x^k$} \vend(note that this is our inductive hypothesis)\vbeg and $m > 0$ and \p{$m$ is even} then
+
+:$pow(x,m+1) = x \cdot pow(x,((m+1)-1)/2) \cdot pow(x,((m+1)-1)/2)$,
+
+$(m+1)-1 = m$
+
+and $pow(x,((m+1)-1)/2) = pow(x,m/2)$,
+
+:$pow(x,m+1) = x \cdot pow(x,m/2) \cdot pow(x,m/2)$,
+
+and by our induction hypothesis, $pow(x,m/2) = x^{m/2}$, so we have,
+
+:$pow(x,m+1) = x \cdot x^{m/2} \cdot x^{m/2}$,
+
+:$pow(x,m+1) = x^{m+1}$.
+.\vend
+
+We finish the argument by considering the case in which $m$ is odd. 
+
+\vbeg
+Assert for any $x \in \Z, m \in \N$, if {for all $k \in \N$, $k \leq m$ implies that $pow(x,k) = x^k$} and $m > 0$ and \p{$m$ is odd} then
+
+:$pow(x,m+1) = pow(x,(m+1)/2) \cdot pow(x,(m+1)/2)$,
+
+and by our induction hypothesis, $pow(x,(m+1)/2) = x^{(m+1)/2}$,
+
+:$pow(x,m+1) = x^{(m+1)/2} \cdot x^{(m+1)/2}$,
+
+:$pow(x,m+1) = x^{m+1}$.
+\vend
+
+We can now summarize the inductive portion of our argument.
+\vbeg
+Assert for any $x \in \Z, m \in \N$, if {for all $k \in \N$, $k \leq m$ implies that $pow(x,k) = x^k$} and $m > 0$ then 
+
+{if \p{$m$ is odd} then $pow(x,m+1) = x^{m+1}$} and
+{if \p{$m$ is even} then $pow(x,m+1) = x^{m+1}$}.
+\vend

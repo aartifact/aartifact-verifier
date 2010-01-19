@@ -1,0 +1,223 @@
+In the verifier, constant integer literals are by default members of the built-in $\Z$ constant.
+
+== Assumptions and Definitions ==
+
+=== Parity ===
+
+\vbeg
+Assume for any $i \in \Z$, \p{$i$ is even} iff there exists $k \in \Z$ s.t. $i = 2 \cdot k$.
+
+Assume for any $i \in \Z$, \p{$i^2$ is even} implies that \p{$i$ is even}.
+
+Assume for any $i \in \Z$, \p{$2 \cdot i + 1$ is odd}.
+
+Assume that if there exist $i, j \in \Z$ s.t. \p{$i$ is even}, \p{$j$ is even}, and \p{$i$ and $j$ have no common factors} then \p{we have a contradiction}.
+
+Introduce $even, odd$.
+
+Assume for any $i \in \Z$, {$even(i) = 1$ iff \p{$i$ is even}} and {$even(i) = 0$ iff \p{$i$ is odd}}.
+
+Assume for any $i \in \Z$, {$odd(i) = 1$ iff \p{$i$ is odd}} and {$odd(i) = 0$ iff \p{$i$ is even}}.
+
+\vend
+
+=== Negative and Positive ===
+
+We define the sign (or signum) function.
+
+\vbeg
+Introduce $sgn$: assume for any $z \in \Z$,
+
+{if $z < 0$ then $sgn(z) = -1$},
+
+{if $z = 0$ then $sgn(z) = 0$},
+
+{if $z > 0$ then $sgn(z) = 1$}.
+
+
+Introduce $pos$: assume for any $z \in \Z$,
+
+{if $z > 0$ then $pos(z) = 1$},
+
+{if $z \leq 0$ then $pos(z) = 0$},
+
+$pos(z) \in \N$.
+
+
+Introduce $neg$: assume for any $z \in \Z$,
+
+{if $z < 0$ then $neg(z) = 1$},
+
+{if $z \geq 0$ then $neg(z) = 0$},
+
+$neg(z) \in \N$.
+
+\vend
+
+=== Factoring ===
+
+\vbeg
+
+Assume for any $S$, for any $n \in S$, \p{$n$ is a factor of $\prod_{i \in S} i$}.
+
+\vend
+
+
+
+Sets are supported natively, and there is extensive support for finite sets.
+
+== Assumptions and Definitions ==
+
+=== Simple Cartesian Product ===
+\vbeg
+Assume for any $X,Y$, for any $x \in X, y \in Y$, $(x,y) \in X \times Y$.
+
+Assume for any $X,Y$, for any $p \in X \times Y$, there exists $x \in X, y \in Y$ s.t. $p = (x,y)$.
+\vend
+=== Maps ===
+\vbeg
+Assume for any $X, Y, f$, $f \in X \rightarrow Y$ iff for any $x \in X$, $f(x) \in Y$.
+\vend
+=== Injections, Surjections, and Bijections ===
+\vbeg
+Assume for any $X, Y$, for any $f$, \p{$f$ is surjective} iff for all $y \in Y$, there exists $x \in X$ such that $f(x) = y$.
+
+Assume for any $X, Y$, for any $f$, \p{$f$ is injective} iff {for all $x,x' \in X$, if $f(x) = f(x')$ then $x = x'$}.
+
+Assume for any $f$, \p{$f$ is injective} and \p{$f$ is surjective} iff \p{$f$ is bijective}.
+\vend
+
+== Finite Set Examples ==
+\vbeg
+Introduce $S$: assume $S = \{1,\ldots,100\}$.
+
+Assert $(1, (2,3)) \in S \times (S \times S)$.
+
+Assert $(1,2,3) \in S \times S \times S$.
+
+Assert $|S \times S| = 10000$.
+\vend
+
+
+
+
+
+
+
+
+
+
+
+
+
+== Dependencies ==
+
+\vinclude[[Integer]]
+\vinclude[[Set]]
+
+== Assumptions ==
+
+\vbeg
+Assume for any $X, Y$, \p{$X$ and $Y$ have the same cardinality} iff $|X| = |Y|$.
+\vend
+
+Intuitively, if it is possible to map every element $x \in X$ to an element $y \in Y$ such that no element of $y$ is ever re-used, then it must be that the size of $Y$ is at least the size of $X$.
+\vbeg
+Assume for any $X, Y$, if there exists $g \in X \rightarrow Y$ such that \p{$g$ is injective} then $|Y| \geq |X|$.
+\vend
+
+If there is a one-to-one correspondence between two sets, then we define them to have the same size.
+\vbeg
+Assume for any $X, Y$, if there exists $f \in X \rightarrow Y$ such that \p{$f$ is bijective} then $|X| = |Y|$.
+
+Assume for any $X, Y$, if $|X| \geq |Y|$ and $|Y| \geq |X|$ then $|X| = |Y|$.
+\vend
+
+== Examples of Derived Facts ==
+
+We write a few simple proofs about the cardinalities of some common sets. In these examples, the proof involves defining an explicit mapping, and then showing that it is injective.
+
+=== There are at least as many rational numbers as integers ===
+
+\vbeg
+
+Define $i$: assume $i \in \Z \rightarrow \Q$ and for any $x \in \Z$, $i(x) = x$.
+
+Assert that for any $x \in \Z$, $i(x) \in \Q$.
+
+Assert for any $z,z' \in \Z$, if $i(z) = i(z')$ then $i(z) = z$, $i(z') = z'$, and $z = z'$.
+
+Assert for any $z,z' \in \Z$, if $i(z) = i(z')$ then $z = z'$.
+
+Assert \p{$i$ is injective}.
+
+Assert $|\Q| \geq |\Z|$.
+
+\vend
+
+=== There are at least as many integers as rational numbers ===
+
+\vbeg
+
+Define $g$: assume $g \in \N \rightarrow \Z$ and for any $n \in \N$, $g(n) = n$.
+
+Assert that for any $n \in \N$, $g(n) \in \Z$.
+
+Assert for any $n,n' \in \N$, if $g(n) = g(n')$ then $g(n) = n$, $g(n') = n'$, and $n = n'$.
+
+Assert for any $n,n' \in \N$, if $g(n) = g(n')$ then $n = n'$.
+
+Assert \p{$g$ is injective}.
+
+Assert $|\Z| \geq |\N|$.
+
+\vend
+
+=== There are at least as many natural numbers as integers ===
+
+\vbeg
+
+Assume for any $z \in \Z$, $2 \cdot |z| - neg(z) \in \N$.
+
+Assume for any $z,r \in \Z$, if $r = 2 \cdot |z| - neg(z)$ then $z = (-1)^{odd(r)} \cdot (r + odd(r)) / 2$.
+
+
+Define $h$: assume $h \in \Z \rightarrow \N$ and for any $x \in \Z$, $h(x) = 2 \cdot |x| - neg(x)$.
+
+
+
+Assert that for any $x \in \Z$, $2 \cdot |x| - neg(x) \in \N$ and $h(x) \in \N$.
+
+
+
+Assert for any $z,z' \in \Z$, if $h(z) = h(z')$ then
+
+$(-1)^{odd(h(z))} \cdot (h(z) + odd(h(z))) / 2 = (-1)^{odd(h(z'))} \cdot (h(z') + odd(h(z'))) / 2$,
+
+$z = (-1)^{odd(h(z))} \cdot (h(z) + odd(h(z))) / 2$,
+
+$z' = (-1)^{odd(h(z'))} \cdot (h(z') + odd(h(z'))) / 2$,
+
+$z = z'$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Assert for any $z,z' \in \Z$, if $h(z) = h(z')$ then $z = z'$.
+
+Assert \p{$h$ is injective}.
+
+Assert $|\N| \geq |\Z|$.
+
+Assert $|\N| = |\Z|$.
+
+\vend

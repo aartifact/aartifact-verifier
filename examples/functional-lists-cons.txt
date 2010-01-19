@@ -1,0 +1,24 @@
+\vbeg
+ Introduce #idf,map#.
+ Assume #\forall x. idf x = x#.
+
+ Assert #map idf nil = nil#.
+
+ Introduce #xs#.
+ Assert 
+   #
+   \forall x,xs.
+                           map idf xs  = xs
+      \Rightarrow  cons x (map idf xs) = cons x xs
+      \wedge       map idf (cons x xs) = cons (idf x) (map idf xs)
+      \wedge       idf x = x
+      \wedge       map idf (cons x xs) = cons x (map idf xs)
+      \wedge       cons x (map idf xs) = cons x xs
+      \wedge       map idf (cons x xs) = cons x xs
+   #.
+
+ Assert for all $x,xs$,
+   $map idf xs  = xs$ implies  $cons x (map idf xs) = cons x xs$. 
+
+
+\vend

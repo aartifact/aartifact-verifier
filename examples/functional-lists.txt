@@ -1,0 +1,319 @@
+Proofs by induction involving pure functional definitions can be accommodated. We present several example proofs of propositions about functional code. Some examples are drawn directly from an introductory text on functional programming [1]. In this article, we delimit the mathematical notation with pounds signs (# ... #) to avoid invoking the LaTeX parser.
+
+== Examples with lists ==
+
+The option to perform lightweight verification makes it possible to focus on certain aspects of the formal reasoning and proof authoring process without being bogged down in other aspects. For instance, the following examples make no explicit mention of the induction principle on lists. In fact, there is no mention of types. Nevertheless, '''some''' verification is possible: one can be certain a proof is correct by confirming that the proof can be verified automatically, and then briefly inspecting the assumptions and superficial structure of the proof. This brief manual inspection is significantly more simple than a manual proof verification.
+
+The following assumptions correspond to several common list functions.
+\vbeg
+ Introduce #cons, nil#.
+
+ Introduce #length, append, map, foldr#.
+
+ Assume #              length         nil = 0#.
+ Assume #\forall x,xs. length (cons x xs) = 1 + length xs#.
+
+ Assume #\forall ys.      append nil         ys = ys#.
+ Assume #\forall x,xs,ys. append (cons x xs) ys = cons x (append xs ys)#.
+
+ Assume #\forall f.      map f nil         = nil#.
+ Assume #\forall f,x,xs. map f (cons x xs) = cons (f x) (map f xs)#.
+
+ Assume #\forall f,b.      foldr f b nil         = b#.
+ Assume #\forall f,b,x,xs. foldr f b (cons x xs) = f x (foldr f b xs)#.
+\vend
+
+=== Example 1 ===
+\vbeg
+ Introduce #idf#.
+ Assume #\forall x. idf x = x#.
+
+ Assert #map idf nil = nil#.
+
+ Introduce #xs#.
+ Assert
+   #
+   \forall x,xs.
+                           map idf xs  = xs
+      \Rightarrow  cons x (map idf xs) = cons x xs
+      \wedge       map idf (cons x xs) = cons (idf x) (map idf xs)
+      \wedge       idf x = x
+      \wedge       map idf (cons x xs) = cons x (map idf xs)
+      \wedge       cons x (map idf xs) = cons x xs
+      \wedge       map idf (cons x xs) = cons x xs
+   #.
+\vend
+
+=== Example 2 ===
+
+Suppose we have an associative binary operator and corresponding identity.
+\vbeg
+ Introduce #op, id#.
+
+ Assume #\forall x. op id x = x#.
+ Assume #\forall x. op x id = x#.
+ Assume #\forall x,y,z. op x (op y z) = op (op x y) z#.
+\vend
+We want to show that for any two lists, concatenating then folding with respect to the operator is the same as folding each of the two lists, and then concatenating the results.
+\vbeg
+ Assert
+   #
+   \forall ys.
+               append nil ys = ys
+      \wedge   foldr op id ys  = foldr op id (append nil ys)
+      \wedge   foldr op id nil = id
+      \wedge   op id (foldr op id ys) = foldr op id ys
+
+      \wedge   op id (foldr op id ys) = foldr op id (append nil ys)
+      \wedge   op (foldr op id nil) (foldr op id ys) = foldr op id (append nil ys)
+   #.
+\vend
+
+\vbeg
+ Assert
+   #
+   \forall x, xs, ys.
+          op (foldr op id xs) (foldr op id ys) = foldr op id (append xs ys)
+   \Rightarrow
+          op x (op (foldr op id xs) (foldr op id ys)) = op x (foldr op id (append xs ys))
+
+  %-- right side
+  \wedge  foldr op id (cons x (append xs ys)) = op x (foldr op id (append xs ys))
+  \wedge  (append (cons x xs) ys) = cons x (append xs ys)
+  \wedge  foldr op id (cons x (append xs ys)) = foldr op id (append (cons x xs) ys)
+
+  %-- left side
+  \wedge  op x (op (foldr op id xs) (foldr op id ys)) = op (op x (foldr op id xs)) (foldr op id ys)
+  \wedge  foldr op id (cons x xs) = op x (foldr op id xs)
+  \wedge  op x (op (foldr op id xs) (foldr op id ys)) = op (foldr op id (cons x xs)) (foldr op id ys)
+
+  \wedge  op (foldr op id (cons x xs)) (foldr op id ys) = foldr op id (append (cons x xs) ys)
+  #.
+\vend
+
+=== Example 3 ===
+
+Suppose we want to show that the empty list is also an identity for the function that appends lists. The definition of the function already shows that it is a left identity, so all that remains is to show by induction that it is a right identity. The base case is trivial.
+\vbeg
+ Assert #append nil nil = nil#.
+\vend
+The inductive case it only slightly more complex.
+\vbeg
+ Assert
+   #
+   \forall x,xs.
+                      append xs nil = xs
+   \Rightarrow
+             cons x (append xs nil) = cons x xs
+   \wedge  (append (cons x xs) nil) = cons x (append xs nil)
+   \wedge    append (cons x xs) nil = cons x xs
+  #.
+\vend
+
+=== Example 4 ===
+
+Suppose we want to show that the function for appending lists is associative. We only need to perform induction over the first argument to the function because the second argument is never decomposed within the function's definition. We begin with the base case.
+\vbeg
+ Assert
+   #
+   \forall ys, zs.
+             append ys zs = append ys zs
+   \wedge  append nil ys = ys
+   \wedge  append nil (append ys zs) = append ys zs
+   \wedge  append (append nil ys) zs = append nil (append ys zs)
+   #.
+\vend
+We present the inductive step.
+\vbeg
+ Assert
+   #
+   \forall x, xs, ys, zs.
+     append (append xs ys) zs = append xs (append ys zs)
+   \Rightarrow
+
+     %-- put "x" on both sides
+           cons x (append (append xs ys) zs) = cons x (append xs (append ys zs))
+
+     %-- right side
+   \wedge  append (cons x xs) (append ys zs) = cons x (append xs (append ys zs))
+
+     %-- left side
+   \wedge            (append (cons x xs) ys) = cons x (append xs ys)
+   \wedge  append (append (cons x xs) ys) zs = append (cons x (append xs ys)) zs
+   \wedge  append (cons x (append xs ys)) zs = cons x (append (append xs ys) zs)
+   \wedge  append (append (cons x xs) ys) zs = append (cons x xs) (append ys zs)
+  #.
+\vend
+
+=== Example 5 ===
+
+We write a proof drawn from an example in an introductory text [1]. If the verifier were restricted to a symbolic search algorithm (without native support for algebraic manipulation of equations), the following assumptions might be needed. However, ''they are not necessary'' for our verifier. We reproduce them here for the sake of completeness.
+
+ Assume \forall x. 0 = 2 * 0
+ Assume \forall x,y,z. (z*x) + (z*y) = z*(x+y)
+
+We now present the example. Suppose we have defined the following two functions.
+\vbeg
+ Introduce #sum, doubleAll#.
+
+ Assume #              sum nil         = 0#.
+ Assume #\forall x,xs. sum (cons x xs) = x + (sum xs)#.
+
+ Assume #              doubleAll nil         = nil#.
+ Assume #\forall z,zs. doubleAll (cons z zs) = cons (2 \cdot z) (doubleAll zs)#.
+\vend
+We now want to prove that for any list, it is the case that doubling the sum is equivalent to taking the sum of the doubled elements of the list. We start with the base case.
+\vbeg
+ Assert
+   #
+                            0 = 2 \cdot 0
+   \wedge sum nil             = 2 \cdot (sum nil)
+   \wedge sum (doubleAll nil) = 2 \cdot (sum nil)
+   #.
+\vend
+Next, we present the inductive step.
+\vbeg
+ Assert
+   #
+   \forall x,xs.
+                        sum (doubleAll xs) =               2 \cdot (sum xs)
+  \Rightarrow
+          (2 \cdot x) + sum (doubleAll xs) = (2 \cdot x) + 2 \cdot (sum xs)
+
+  %-- We first rewrite the left side.
+  \wedge  (2 \cdot x) + (2 \cdot (sum xs)) = 2 \cdot (x + sum xs)
+  \wedge  sum (cons x xs) = x + sum xs
+  \wedge  (2 \cdot x) + (2 \cdot (sum xs)) = 2 \cdot (sum (cons x xs))
+
+  %-- Next, we rewrite the right side.
+  \wedge  sum (cons (2 \cdot x) (doubleAll xs)) = (2 \cdot x) + sum (doubleAll xs)
+  \wedge  doubleAll (cons x xs) = cons (2 \cdot x) (doubleAll xs)
+  \wedge  sum (doubleAll (cons x xs)) = (2 \cdot x) + sum (doubleAll xs)
+
+  %-- Finally, we put the two sides back together.
+  \wedge  sum (doubleAll (cons x xs)) = 2 \cdot (sum (cons x xs))
+  #.
+\vend
+
+=== Example 6 ===
+
+For this next example, we again present a few assumptions that ''are not required'' for our verifier.
+
+ Assume \forall x. 0 + x = x
+ Assume \forall x,y,z. x+(y+z) = (x+y)+z
+
+Suppose we want to prove that taking the lengths of two lists and adding them is equivalent to appending those same two lists and then computing the length of the result. We present the base case.
+\vbeg
+ Assert
+   #
+   \forall ys.
+                    append nil ys = ys
+   \wedge  length (append nil ys) = length ys
+   \wedge  0 + length ys = length ys
+   \wedge  length (append nil ys) = 0 + length ys
+   \wedge  length (append nil ys) = length nil + length ys
+   #.
+\vend
+Next, we present the inductive step.
+\vbeg
+ Assert
+   #
+   \forall x,xs,ys.
+     length (append xs ys) = length xs + length ys
+   \Rightarrow
+     1 + length (append xs ys) = 1 + (length xs + length ys)
+
+  %-- We first rewrite the left side.
+  \wedge  length (cons x (append xs ys)) = 1 + length (append xs ys)
+  \wedge  append (cons x xs) ys = cons x (append xs ys)
+  \wedge  length (append (cons x xs) ys) = 1 + length (append xs ys)
+
+  %-- Then we rewrite the right side.
+  \wedge  1 + (length xs + length ys) = (1 + length xs) + length ys
+  \wedge  length (cons x xs) = 1 + length xs
+  \wedge  1 + (length xs + length ys) = length (cons x xs) + length ys
+
+  %-- Finally, we put the two sides back together
+  \wedge  length (append (cons x xs) ys) = length (cons x xs) + length ys
+  #.
+\vend
+
+== Examples with other other datatypes ==
+
+=== Naturals ===
+
+Suppose we have the following data type definition (e.g. in Haskell), representing natural numbers. The ``Z" constructor corresponds to 0, and the ``S" constructor corresponds to (+1).
+
+ data Nat = Z | S Nat
+
+Furthermore, suppose we defined addition on objects of type "Nat" using the following function:
+
+ plus Z     n = Z
+ plus (S m) n = S (plus m n)
+
+If we want to model this situation mathematically, we would introduce all the defined entities (the constructors and function), and then write universally quantified equations to represent the function definition.
+\vbeg
+ Introduce #Z, S, plus#.
+
+ Assume #\forall n.   plus Z     n = Z#.
+ Assume #\forall m,n. plus (S m) n = S (plus m n)#.
+\vend
+Now, suppose we want to show that for any ``x", we also have that
+
+ plus x Z = x
+
+The equations alone don't tell us this directly, so we need to prove it by induction. In other words, we have to show that the above statement holds for all possible ``x" of type ``Nat" by first showing that the ``x = Z" case holds, and then showing that if it holds for some ``x", then it holds for ``S x".
+
+First, we verify that the base case holds. The below assertion is verified automatically because it's just an application of the first assumption above in which the ``n" in ``\forall n. ..." is instantiated to ``Z".
+\vbeg
+ Assert #plus Z Z = Z#.  %-- by definition of "plus"
+\vend
+Now, we review two operators from logic: implication #\Rightarrow# and conjunction #\wedge#. These are understood by the verifier in the usual way. For example, we could assert that equality is transitive.
+
+ Assert #\forall x,y,z.
+            x = y \wedge y = z  \Rightarrow x = z#.
+
+The above should be read as ``for any x,y,z, if x is equal to y and y is equal to z then x is equal to z". The #\wedge# operator has precedence over #\Rightarrow#, so no parentheses are necessary. We can now use these operators to construct the inductive case of our proof.
+\vbeg
+ Assert
+   #
+   \forall x.
+               plus x Z = x            %-- inductive hypothesis
+   \Rightarrow                         %-- "implies that"
+           S (plus x Z) = S x          %-- apply "S" to both sides
+   \wedge  plus (S x) Z = S (plus x Z) %-- by definition of "plus"
+   \wedge  plus (S x) Z = S x          %-- by transitivity of equality
+   #.
+\vend
+The above can now be summarized for concision.
+\vbeg
+ Assert #\forall x. plus x Z = x \Rightarrow plus (S x) Z = S x#.
+\vend
+We can also restate both cases if we want to do so.
+\vbeg
+ Assert
+   #
+          plus Z Z = Z
+   \wedge \forall x. plus x Z = x \Rightarrow plus (S x) Z = S x
+   #.
+\vend
+Thus, we've proven our result by induction over ``x". Note that the verifier supports ``sequenced" equalities:
+
+ Assert #\forall x,y,z. x = y = z \Rightarrow x = z#.
+
+This might sometimes be a more concise way to do a proof. For example, the above proof of the inductive case could look a little shorter as follows.
+\vbeg
+ Assert
+  #
+  \forall x.
+        plus x Z = x
+  \Rightarrow
+          S (plus x Z) = S x
+  \wedge  plus (S x) Z = S (plus x Z) = S x
+  #.
+\vend
+
+== References ==
+
+[1] Simon Thompson. <i>The Haskell: The Craft of Functional Programming.</i> Addison-Wesley
+Longman Publishing Co., Inc., Boston, MA, USA, 1999.

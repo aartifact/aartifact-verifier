@@ -1,0 +1,155 @@
+NetSketch is a tool for the specification of constrained-flow applications and the certification of desirable safety properties imposed thereon. NetSketch is conceived to assist system integrators in two types of activities: modeling and design. It provides capabilities for compositional analysis based on a strongly-typed domain-specific language (DSL) for describing and reasoning about constrained-flow networks and invariants that need to be enforced thereupon.
+
+= Use cases for an integrated automated assistant =
+
+
+
+Introduce $D,V,F$.
+
+Assume $D$ is a parameter type, $V$ is a parameter type.
+
+Introduce $F$. Assume $F = V * D = D * V$.
+
+
+Consider for any $e,e',T$, if $T$ is a parameter type, $e \in T$, and $e' \in T$ then $e + e' \in T$.
+
+Consider for any $e,e',T,T'$, if $T$ is a parameter type, $T'$ is a parameter type, $e \in T$, and $e' \in T$ then $e * e' \in T * T'$.
+
+Introduce $d,v$.
+Assume $d \in D$, $v \in V$.
+
+Assert $d + d \in D$.
+
+Assert $d * v \in D * V$.
+
+
+
+\vbeg
+
+Introduce $P$.
+
+
+
+Introduce constants $ConstExp, LinExp, QuadExp$.
+Assume $ConstExp \leq LinExp$, $LinExp \leq QuadExp$.
+
+
+
+
+Assume for any $p$, if $p \in P$ then $p$ is a parameter.
+
+Introduce $D,V$.
+Assume $D \subset P$, $V \subset P$.
+
+
+Introduce $d,v$.
+
+Assume $\{d_1,d_2,d_3\} \subset D$, $\{v_1,v_2,v_3\} \subset V$.
+
+
+Consider for any $v$, if $v \in V$ then $v$ is a velocity expression.
+
+Consider for any $d$, if $d \in D$ then $d$ is a density expression.
+
+Consider for any $e,e'$, if $e$ is a density expression and $e'$ is a density expression then $e+e'$ is a density expression.
+
+Consider for any $e,e'$, if $e$ is a velocity expression and $e'$ is a velocity expression then $e+e'$ is a velocity expression.
+
+Consider for any $e,e'$, if $e$ is a mass flow expression and $e'$ is a mass flow expression then $e+e'$ is a mass flow expression.
+
+Consider for any $e,e'$, if $e$ is a density expression and $e'$ is a velocity expression then $e*e'$ is a mass flow expression.
+
+Consider for any $e,e'$, if $e$ is a velocity expression and $e'$ is a density expression then $e*e'$ is a mass flow expression.
+
+Assert $v_1 * d_1$ is a mass flow expression.
+
+
+
+Consider for any $e$, if $e$ is a parameter then $e \in LinExp$.
+
+Consider for any $e,e',s,s'$, if $e \in s$ and $e' \in s'$ and $s \leq s'$ then $e+e' \in s'$.
+Consider for any $e,e',s,s'$, if $e \in s$ and $e' \in s'$ and $s' \leq s$ then $e+e' \in s$.
+
+
+
+
+
+
+
+
+\vend
+
+
+== Derivation and verification of sorts for expressions and constraints ==
+
+\vbeg
+Introduce $V,D,F,K$. Assume $V \subseteq \N$, $D \subseteq \N$, $F \subseteq \N$, $K \subseteq \N$.
+
+Assume considering $v + v'$, if $v \in V$ and $v' \in V$ then $v+v' \in V$.
+
+Assume considering $d + d'$, if $d \in D$ and $d' \in D$ then $d+d' \in V$.
+
+Assume considering $f + f'$, if $f \in F$ and $f' \in F$ then $f+f' \in V$.
+
+Assume considering $d * v$, if $d \in D$ and $v \in V$ then $d * v \in F$.
+
+Assume considering $f * v$, if $f \in F$ and $v \in V$ then $f * v \in K$.
+
+Assume considering $x * y$, if $x$ is density and $y$ is velocity then $x * y$ is flow.
+\vend
+
+\vbeg
+
+Introduce $d,v$.
+Assume $\{d_1,d_2,d_3\} \subset D$, $\{v_1,v_2,v_3\} \subset V$.
+
+Assert $d_1 * v_1 \in F$.
+
+\vend
+
+== Derivation of constraint class ==
+
+\vbeg
+
+Assume considering $x=y$, if $x \in D$ and $y \in D$ then \l{$x=y$ is a linear constraint}.
+
+Assume considering $x \leq y$, if $x \in D$ and $y \in D$ then \l{$x \leq y$ is a linear constraint}.
+
+Assume considering $x \geq y$, if $x \in D$ and $y \in D$ then \l{$x \geq y$ is a linear constraint}.
+
+
+Introduce $d,v$.
+Assume $\{d_1,d_2,d_3\} \subset D$, $\{v_1,v_2,v_3\} \subset V$.
+
+
+
+Assert $d_1 \leq d_2$ is a linear constraint.
+
+
+
+\vend
+
+
+
+== Relationships between constraints ==
+
+\vbeg
+Introduce $d,v$.
+Assume $\{d_1,d_2,d_3\} \subset \N$, $\{v_1,v_2,v_3\} \subset \N$.
+
+Assume $d_1 = d_2 + d_3$.
+Assume $d_1 * v_1 = d_2 * v_2 + d_3 * v_3$.
+
+Assume $v_1 \neq 0$.
+
+Assert if $v_2 + v_3 > 0$ then $v_1 > 0$.
+
+Assert if $d_2 \geq 0$ and $d_3 \geq 0$ then $d_1 \geq 0$.
+
+Assert $d_1 \in \N$.
+
+Assert if $d_1 = d_2 + d_3$ then 
+$d_1 - d_3 = d_2 + d_3 - d_3$, 
+$d_1 - d_3 = d_2$.
+
+\vend

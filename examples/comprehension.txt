@@ -1,0 +1,34 @@
+
+
+Assume for any $i$, $(1(i)) = (\{x | x \in \{0\}, i\})$.
+Assert $|1(1=1)| = 1$.
+
+
+
+
+
+
+\vbeg
+
+Assume $\neg(\neg (\p{test}))$.
+Assert $\p{test}$.
+%--Assert $\neg(\p{test})$.
+
+Assume \p{A} implies \p{B}.
+Assume \p{A} implies not \p{B}.
+Assert not \p{A}.
+
+Assume for all $x$, \p{$x$ is a number}.
+
+
+%--Introduce $X$:
+%--Assume for any $x$, $X$ iff $x = 1$.
+%-- Assume for any $x$,  $x = 1$ iff \p{$x$ test}.
+
+%--Assert \p{$2$ test}.
+
+%--Assert $X$.
+
+Assert $\{1\}$.
+
+\vend

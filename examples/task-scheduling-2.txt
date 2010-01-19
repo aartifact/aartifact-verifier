@@ -1,0 +1,59 @@
+This article presents an example that involves reasoning about task scheduling transformations.
+
+== Definitions ==
+
+\vbeg
+
+Assume for any $C,T$, \l{$(C,T)$ is a task} iff $C \in \N$, $T \in \N$, $C \geq 1$, and $T \geq 1$.
+
+\vend
+
+We define a notion of satisfaction for allocations and tasks (sliding window).
+
+\vbeg
+
+Assume for any $a,C,T$,
+::\l{$a$ satisfies $(C,T)$}
+:iff
+::\l{$(C,T)$ is a task},
+::$a \in \N^\ast$,
+::\l{$a$ is an infinite sequence}, and
+
+::for all $m \in \N$, ${\sum_{x \in \{a_m, \ldots, a_{m+(T-1)}\}} x} \geq C$.
+
+\vend
+
+== Results ==
+
+We prove that for any allocation that satisfies a task, the same allocation satisfies any task with a later deadline.
+
+\vbeg
+
+Assert for any $a,C,T$, if \l{$(C,T)$ is a task} and \l{$a$ satisfies $(C,T)$} then
+$T \in \N$, $C \in \N$,
+$T \geq 1$,
+$C \geq 1$,
+\l{$a$ is an infinite sequence},
+$a \in \N^\ast$,
+
+:for all $T' \in \N, K \in \N, r \in \N$, if $T' \geq T$ and $T' = 3$ then
+
+\l{$(C,T')$ is a task}, and
+
+$T' \geq T$,
+
+for all $m \in \N$,
+
+for all $k \in \{0,\ldots,K\}$,
+
+
+
+$\{m+k,\ldots,m+(T-1)+k\} \subseteq \{m,\ldots,m+(T'-1)\}$,
+
+
+
+:$\{a_m, \ldots, a_{m+(T-1)}\} \subseteq \{a_m, \ldots, a_{m+(T'-1)}\}$
+
+and $\{x|x \in \N\}$ is a set.
+
+\vend

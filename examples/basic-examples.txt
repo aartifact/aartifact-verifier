@@ -1,0 +1,143 @@
+A collection of various examples is assembled here for testing and easy reference.
+
+== Trivial Examples with Naturals ==
+
+\vbeg
+Assume for any $v, v'$, $v \geq 0$ and $v' \geq 0$ implies $v + v' \geq 0$.
+
+Assert $1 + 2  \geq 0$.
+\vend
+
+== Trivial Logic Example ==
+
+Explicit English phrases are treated as boolean constants (or boolean predicates, if they contain arguments). In this interface, predicates are highlighted in red.
+
+\vbeg 
+Assume if \p{Esther has skipped a meal} then \p{Esther is hungry}. 
+Assume if \p{Esther is hungry} then \p{Esther will not forget to eat the next meal}. 
+
+Assert if \p{Esther has skipped a meal} then \p{Esther will not forget to eat the next meal}. 
+\vend
+
+== Doing Minimal Logic ==
+
+Logical disjunction is not supported directly, but we may use it by introducing appropriate axioms:
+
+\vbeg
+Assume for any $a, b$, $a$ implies {$a$ or $b$} and $b$ implies {$a$ or $b$}.
+
+Assume \p{Esther has skipped a meal}
+
+Assert {\p{Esther has skipped a meal} or \p{Esther is hungry}}.
+\vend
+
+\vbeg
+Assume for any $a, b, c$, if {$a$ implies $c$} and {$b$ implies $c$} then {{$a$ or $b$} implies $c$}.
+
+Assume if \p{Esther has skipped a meal} then \p{Esther will not forget to eat the next meal}.
+
+Assume if \p{Esther is hungry} then \p{Esther will not forget to eat the next meal}.
+
+Assume \p{Esther has skipped a meal} or \p{Esther is hungry}.
+
+Assert \p{Esther will not forget to eat the next meal}.
+\vend
+
+== Induction Template ==
+
+
+Assume for all $P$, if $P(0)$ and {for all $n \in \N$, $P(n)$ implies that $P(n+1)$ } then {for all $n \in \N$, $P(n)$}.
+
+Introduce $Q$.
+Assume $Q(0)$
+Assume for all $n \in \N$, $Q(n)$ implies that $Q(n+1)$
+Assert for all $n \in \N$, $Q(n)$
+
+Assert $Q(32)$
+
+
+== Algebraic Manipulations ==
+\vbeg
+
+Introduce $x,y,z$.
+Assume $x \in \R$, $y \in \R$, $z \in \R$.
+
+Assume $(x + y) / 2 = z / 2$.
+Assert $(x/2) + (y/2) = z / 2$.
+
+Assert $((x+1)/2) + ((x+1)/2) = x+1$.
+
+Assert $(x+100)-70 = x+30$.
+
+Assume $y = y/2 + y/2$.
+
+Introduce $f$. Assume for any $x \in \R$, $f(x) = \if x \geq 0 \then 1 \else -1$
+
+Introduce $h$. Assume for any $r \in \R$, $h(r) = r + r$.
+
+Assert $f(-12) = -1$. Assert $h(2) = 4$.
+
+Assume for any $a,b,c \in \R$, $a > b$ and $b > c$ implies $a > c$.
+
+Assume $x > y$, $y > z$.
+Assert $x > z$.
+
+
+Assert $(\sqrt{3+4})^4 = 49$.
+
+Assert $|6-7| = 1$.
+
+Assert $\lfloor 17/5 \rfloor = 3$.
+
+
+Introduce $l,m,n,o,p$:
+Assume $l=m=n=o=p$
+Assume $l < m < n$.
+Assert $l < m$ and $m < n$.
+
+Assert for any $i$, $\neg(i = 1 \wedge i = 2 \wedge i = 3)$.
+
+Assert ${\sum_{x \in \{0,1,2,3\}} x} = 6$.
+
+Assert ${\sum_{x = 0}^{3} x} = 6$.
+
+\vend
+
+Assert $\max \{1,2,3,4\} = 4$
+
+Assert for any $x$, if $x = (1,2)$ then for all $i \in \{0, \ldots, 1\}$, $x_i > 0$.
+
+Assert for all $x \in \{1,2\}$, there exists $y \in \{1,2,3\}$ s.t. $y > x$.
+
+Assert there exists $x,y,z \in \{0,1,2\}$ s.t. $x < y$ and $y < z$
+
+== Sets ==
+
+
+Introduce $S$.
+
+Assume $S = \{1,2,3\}$.
+
+Assert $S \cup \{4,5,6\} = \{6,5,4,3,2,1\}$.
+
+Assert $1 \in S$.
+
+Assert $\{1,\ldots,4\} = \{1,2,3,4\}$.
+
+Assert $\{(1,1), (1,2)\} \subset \{1,3\} \times \{1,2\}$.
+
+Assert for all $x,y \in \{1,2,3\}$, $x\geq 1$ and $y > 0$.
+
+Assert for any $x$, if $x = (1,2)$ then for all $i \in \{0, \ldots, 1\}$, $x_i > 0$.
+
+Assert $5 \in \{x+1 | x \in \{0,\ldots,4\}, x > 3\}$.
+
+
+== Vectors ==
+\vbeg
+
+Assert $(1,2) \circ (3,4) = (1,2,3,4)$.
+
+Assert if $x = (0,1,2,3,4,5,6,7,8)$ then $x_5 = 5$.
+
+\vend

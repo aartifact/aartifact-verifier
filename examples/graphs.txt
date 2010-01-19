@@ -1,0 +1,65 @@
+Graphs can be represented using sets.
+
+== Dependencies ==
+
+== Assumptions ==
+
+\vbeg
+Assume for any $V,E$, \p{$(V,E)$ is a directed graph} iff $E \subset V \times V$.
+
+Assume for any $E, V, p$, \p{$p$ is a path in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph} and
+::{{$|p| = 1$ and $p_0 \in V$} or 
+::$p \in E$ or 
+::{for all $i \in \{0,\ldots,|p| - 2\}$, $(p_i, p_{i+1}) \in E$}}.
+
+Introduce $path$.
+Assume for any $x$, $path(x,x)$.
+
+\vend
+
+== Examples ==
+
+\vbeg
+
+Introduce $V, E$.
+
+Assume $V = \{1,2,3\}$ and $E = \{(1,2), (2,3)\}$.
+
+
+Assert $path(1,1) = (1 < 2)$.
+
+%--Assert \p{$(V, E)$ is a directed graph}.
+
+%--Assert \p{$(1,2,3)$ is a path in $(V, E)$}.
+
+%--Assert \p{$(1,2,3)$ is an acyclic path in $(V, E)$}.
+
+%--Assert \p{$(1,2,3)$ is a Hamiltonian path for $(V,E)$}.
+
+
+
+%--assume for any $V,E,p$, $path(V,E,p)$ iff \p{$p$ is a path in $(V,E)$}.
+
+Introduce $p$: assume $p = (1,2,3)$.
+%--Assume \p{$p$ is a path in $(V,E)$}.
+%--Assert $path(V,E,p)$.
+
+
+%--Assert $p \in \{x | x \in V^3, path(V,E,x)\}$.
+
+%--Assert $path(V,E,(1,2,3)) = (1 < 2)$.
+%--Assert $(2 < 3) = (1 < 2)$.
+
+Assume for any $x$, if $x > 0$ then \p{$x$ is a zoo}.
+
+Introduce $Z,Y$: assume for any $x$, if $x > 0$ then \p{$x$ is a zoo}.      
+
+Assume $Y$.
+assume for all $x$, if \p{$x$ is a zoo} then $Z(x)$.
+
+
+Assert $Z(1) = (1 < 2)$.
+
+
+\vend

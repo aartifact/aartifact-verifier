@@ -1,0 +1,222 @@
+Vectors are natively supported. Vector expressions are comma-separated tuples, the length of a vector $v$ is expressed as $|v|$, and the $i$th element of a vector is denoted $v_i$. Both $(\ldots)$ and $\langle \ldots \rangle$ notations are supported and are treated as equivalent.
+
+== Dependencies ==
+
+\vinclude[[Natural]]
+
+== Assumptions ==
+
+\vbeg
+
+Assume for any $S$, for any $n \in \N$, for any $w \in S^n$, \p{$w$ is a vector}.
+
+Assume for any $v,w$, \p{$v$ is a prefix of $w$} iff {$|w| \geq |v|$ and for all $i \in \{0,\ldots,|v|-1\}$, $v_i = w_i$}.
+
+Assume for any $v,w$, \p{$v$ is a suffix of $w$} iff {$|w| \geq |v|$ and for all $i \in \{0,\ldots,|v|-1\}$, $v_i = w_{|w|-|v|+i}$}.
+
+\vend
+== Examples ==
+
+=== Strings ===
+
+\vbeg
+
+Assert \p{$(1,2)$ is a prefix of $(1,2,3)$} and \p{$(2,3)$ is a suffix of $(1,2,3)$}.
+
+\vend
+The Kleene operator on sets is supported natively. Vectors are the preferred and supported method for representing strings. The operator $\circ$ is overloaded to represent concatenation on strings.
+\vbeg
+
+Introduce $\Sigma$: assume $\Sigma = \{0,1\}$.
+
+Assert $(1,0,1,1,0) \in \Sigma^\ast$.
+
+Assert $(1,0,1,1,0) \circ (1,0,1,1,0) \in \Sigma^\ast$.
+
+\vend
+=== Sorting ===
+\vbeg
+
+Assume for any $v$, \p{$v$ is sorted} iff $|v| \leq 1$ or for all $i \in \{0,\ldots,|v|-2\}$, $v_i \leq v_{i+1}$.
+
+Assert \p{$(1,2,3,3,4)$ is sorted}.
+
+\vend
+
+
+
+
+
+Sets are supported natively, and there is extensive support for finite sets.
+
+== Assumptions and Definitions ==
+
+=== Simple Cartesian Product ===
+\vbeg
+Assume for any $X,Y$, for any $x \in X, y \in Y$, $(x,y) \in X \times Y$.
+
+Assume for any $X,Y$, for any $p \in X \times Y$, there exists $x \in X, y \in Y$ s.t. $p = (x,y)$.
+\vend
+=== Maps ===
+\vbeg
+Assume for any $X, Y, f$, $f \in X \rightarrow Y$ iff for any $x \in X$, $f(x) \in Y$.
+\vend
+=== Injections, Surjections, and Bijections ===
+\vbeg
+Assume for any $X, Y$, for any $f$, \p{$f$ is surjective} iff for all $y \in Y$, there exists $x \in X$ such that $f(x) = y$.
+
+Assume for any $X, Y$, for any $f$, \p{$f$ is injective} iff {for all $x,x' \in X$, if $f(x) = f(x')$ then $x = x'$}.
+
+Assume for any $f$, \p{$f$ is injective} and \p{$f$ is surjective} iff \p{$f$ is bijective}.
+\vend
+
+== Finite Set Examples ==
+\vbeg
+Introduce $S$: assume $S = \{1,\ldots,100\}$.
+
+Assert $(1, (2,3)) \in S \times (S \times S)$.
+
+Assert $(1,2,3) \in S \times S \times S$.
+
+Assert $|S \times S| = 10000$.
+\vend
+
+
+
+
+
+
+
+
+
+
+Graphs can be represented using sets.
+
+== Dependencies ==
+
+\vinclude[[Vector]]
+\vinclude[[Set]]
+
+== Assumptions ==
+
+\vbeg
+Assume for any $V$, for any $E$, if $E \subset V \times V$ then \p{$(V,E)$ is a directed graph}.
+
+Assume for any $E, V, p$, \p{$p$ is a path in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph} and
+::{{$|p| = 1$ and $p_0 \in V$} or 
+::$p \in E$ or 
+::{for all $i \in \{0,\ldots,|p| - 2\}$, $(p_i, p_{i+1}) \in E$}}.
+
+Assume for any $E, V, p,v,v'$, \p{$p$ is a path from $v$ to $v'$ in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph}, \p{$p$ is a path in $(V, E)$}, $p_{0} = v$, and $p_{|p|-1} = v'$.
+
+Assume for any $E, V, p$, \p{$p$ is an acyclic path in $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph}, \p{$p$ is a path in $(V, E)$} and
+:for all $i, j \in \{0,\ldots,|p|-1\}$, $i \neq j$ implies $p_i \neq p_j$.
+
+Assume for any $E, V, p$, \p{$p$ is a Hamiltonian path for $(V, E)$} iff
+:\p{$(V,E)$ is a directed graph}, \p{$p$ is an acyclic path in $(V, E)$}, $|p| = |V|$, and 
+:for all $v \in V$,
+::there exists $j \in \{0,\ldots,|p|-1\}$ s.t. $v = p_j$.
+
+\vend
+
+== Examples ==
+
+\vbeg
+
+Introduce $V, E$.
+
+Assume $V = \{1,2,3\}$ and $E = \{(1,2), (2,3)\}$.
+
+Assert \p{$(V, E)$ is a directed graph}.
+
+Assert \p{$(1,2,3)$ is a path in $(V, E)$}.
+
+Assert \p{$(1,2,3)$ is an acyclic path in $(V, E)$}.
+
+Assert \p{$(1,2,3)$ is a Hamiltonian path for $(V,E)$}.
+
+\vend
+
+
+
+
+We model a restricted variant of the stable paths problem.
+
+== Dependencies ==
+
+\vinclude[[Graph]]
+
+== Assumptions ==
+\vbeg
+
+Assume for any $E,V,d,C$, if \p{$(V,E)$ is a directed graph} and $d \in V$ then
+
+:\p{$C$ is a configuration for $((V,E),d)$} iff 
+::for all $v \in V$,
+:::\p{$C_v$ is a path from $v$ to $d$ in $(V,E)$} and {$|C_v| = 2$ or \p{$C_{(C_v)_1}$ is a suffix of $C_v$}}.
+
+\vend
+== Example ==
+
+We now construct an example of a stable configuration for the following small graph, in which $0$ will be our root node.
+\vbeg
+Introduce $V,E$: assume $V = \{0,1,2\}$ and $E = \{(0,0), (1,0), (2,0), (1,2), (2,1)\}$.
+\vend
+
+This graph has three nodes, and each will be either of type $A$, or type $B$. We assign $A$ and $B$ to constants so that the evaluation algorithm will be able to treat them as constants, and then we define a function $t$ that returns the type of a node.
+\vbeg
+Introduce $A,B$: assume $A = 1$, $B = 2$.
+
+Introduce $t$: assume $t(1) = A$ and $t(2) = B$.
+\vend
+
+We now define the weight function for the graph, as well as how weights over paths are computed.
+\vbeg
+Introduce $w$:
+:assume $w_A(0,0) = 0$, $w_A(1,0) = 20$, $w_A(2,0) = 10$, $w_A(1,2) = 1$, $w_A(2,1) = 1$.
+:assume $w_B(0,0) = 0$, $w_B(1,0) = 10$, $w_B(2,0) = 20$, $w_B(1,2) = 1$, $w_B(2,1) = 1$.
+
+Introduce $weight$:
+:assume for any $p,t$, $weight_t (p) = \sum_{i = 0}^{|p|-2} w_t(p_i,p_{i+1})$.
+\vend
+We can now construct a configuration.
+\vbeg
+Introduce $C$: assume $C = ((0,0), (1,0), (2,1,0))$.
+
+Assert \p{$C$ is a configuration for $((V,E),0)$}.
+\vend
+In fact, it is a stable configuration.
+\vbeg
+Assume for any $V,E,w,C,d$, \p{$C$ is a stable configuration for $(V,E,w,d)$} iff
+:for all $v \in V$, for all $e \in E$,
+::if $e_0 = v$ and $v \neq d$ then $weight_{t(v)} (C_v) \leq w_{t(v)} (e) + weight_{t(v)} (C_{e_1})$.
+
+
+
+Introduce $config$:
+Assume for any $V,E,w,C,d$, $config(V,E,w,d,C)$ iff
+:for all $v \in V$, for all $e \in E$,
+::if $e_0 = v$ and $v \neq d$ then $weight_{t(v)} (C_v) \leq w_{t(v)} (e) + weight_{t(v)} (C_{e_1})$.
+
+Assert \p{$C$ is a stable configuration for $(V,E,w,0)$}.
+
+Introduce $path$: assume for any $V,E,p$, $path(V,E,p)$ iff \p{$p$ is a path in $V,E$}.
+
+%--Introduce $V,E$: assume $V = \{0,1,2\}$ and $E = \{(0,0), (1,0), (2,0), (1,2), (2,1)\}$.
+%--Assert \p{$(1,0,1)$ is a path in $V,E$}.
+
+
+Introduce $Q$:
+Assume $Q = \{p | p \in \bigcup_{i=0}^{3} V^i, path(V,E,p)\}$.
+Assert $|Q| = 12$.
+
+Assert \p{$C$ is a stable configuration for $(V,E,w,0)$}.
+
+Assert $config(V,E,w,0,C)$.
+
+Assert $|\{C | C \in Q^3, (C_0)_0 = 0, (C_1)_0 = 1, (C_2)_0 = 2, config(V,E,w,0,C)\}| = 18$.
+
+\vend

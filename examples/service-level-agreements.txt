@@ -1,0 +1,393 @@
+\vbeg
+Assume for any $X,Y,Z$, $Z = X - Y$ implies $Z \cup Y = X$.
+Assume for any $O'',O',O, P$, if $O'' = O' \cup (O - P)$ then $O'' \subseteq O \cup O'$.
+\vend
+
+\vbeg
+Assert for any $x,y,z \in \R$, if $x > y$ and $y > z$ then $x > z$.
+\vend
+
+\vbeg
+Introduce the constant $\Const$. Assume for any $C$, $C$
+is a constraint set iff $C \subseteq \Const$. Assume for any $C$,
+if $C$ is a constraint set then $C$ is a set.
+
+Introduce the constant $\XC$. Assume for any $P$, $P$ is
+a parameter set iff $P \subseteq \XC$. Assume for any $P$, if $P$
+is a parameter set then $P$ is a set.
+
+Introduce the constant $\parameters$. Assume for any
+$C$, if $C \subseteq \Const$ then $\parameters(C) \subseteq \XC$.
+\vend
+
+\vbeg
+Assume for any $A,I,O,C$,
+    $(A,I,O,C)$ is an untyped module
+  iff
+    $I \subseteq \parameters(C)$,
+    $O \subseteq \parameters(C)$,
+    $O \cap I = \emptyset$, and
+    $C \subseteq \Const$.
+\vend
+
+\vbeg
+Introduce the set operator $\hastype$.
+
+Assume for any $A,I,O,C,C'$,
+    $(A,I,O,C) \hastype C'$ is a typed module
+  iff
+    $(A,I,O,C)$ is an untyped module,
+    $C' \subseteq \Const$, and
+    $\parameters(C') \subseteq I \cup O$.
+\vend
+
+\vbeg
+Introduce the set operator $\sats$.
+\vend
+
+\vbeg
+Introduce the set operators $\Rrightarrow, \LleftRrightarrow$.
+
+Assume for any $C,C'$,
+  if $C \subseteq \Const$, $C' \subseteq \Const$ then
+    $C \Rrightarrow C'$
+  iff
+    {for all $V \in \XC \rightarrow \N$, $V \sats C$ implies $V \sats C'$}.
+
+Assume for any $C,C'$, {$C \LleftRrightarrow C'$} iff {$C \Rrightarrow C'$ and $C' \Rrightarrow C$}.
+\vend
+
+\vbeg
+Assume for any $C,C'$, $C' \subseteq C$ implies $C
+\Rrightarrow C'$.
+\vend
+
+\vbeg
+Introduce the constant $\clo$. Assume for any $C$, $\clo(C) = \{c | c \in \Const, C \Rrightarrow \{c\}\}$.
+Assume for any $C$, if $C \subseteq \Const$ then $\clo(C)
+\subseteq \Const$.
+\vend
+
+\vbeg
+Assume for any $C$, $C \subseteq \clo(C)$.
+Assume for any $C,C'$, $C \subseteq C'$ implies $\clo(C) \subseteq \clo(C')$.
+\vend
+
+\vbeg
+Assume for all $C,C'$,
+  if $\parameters(C) \cap \parameters(C') = \emptyset$ then $\clo(C \cup C') = {\clo(C) \cup \clo(C')}$.
+\vend
+
+\vbeg
+Assume for any $C,C'$, $\parameters(C) \cap \parameters(C') = \emptyset$
+  implies $\parameters(\clo(C)) \cap \parameters(\clo(C')) = \emptyset$.
+\vend
+
+\vbeg
+Introduce set operators $\upharpoonright, \downharpoonright$.
+Assume for any $C,P$,
+    $C \subseteq \Const$ and $P \subseteq \XC$
+  implies that
+    $C \upharpoonright P = \{c | c \in C, \parameters(c) \subseteq P\}$,
+    $C \downharpoonright P = \{c | c \in C, \parameters(c) \cap P \neq \emptyset\}$.
+\vend
+
+\vbeg
+Assume for any $C,P$, $C \upharpoonright P \subseteq C$.
+Assume for any $C,P$, $C \downharpoonright P \subseteq C$.
+Assume for any $C,C',S,S'$, if $C \subseteq C'$ and $S \subseteq S'$ then $ {C' \upharpoonright S'} \Rrightarrow {C \upharpoonright S}$.
+Assume for any $C,C',S,S'$, if $C \subseteq C'$ and $S \subseteq S'$ then ${C' \downharpoonright S'} \Rrightarrow {C \downharpoonright S}$.
+Assume for any $C,C',P,P'$,
+    $\parameters (C) \cap \parameters(C') = \emptyset$
+  implies that
+    $(C \downharpoonright P) \cup (C' \downharpoonright P') = (C \cup C') \downharpoonright (P \cup P')$.
+\vend
+
+\vbeg
+Introduce the constants $\pre, \post$.
+Assume for any $M,I,O,\CC,C$,
+  $\pre((M,I,O,\CC),C) = \clo(C) \upharpoonright I$,
+  $\post((M,I,O,\CC),C) = \clo(C) \downharpoonright O = \clo(C) - \pre((M,I,O,\CC),C)$.
+\vend
+
+\vbeg
+Assume for all $M,I,O,\CC,C$, $C \Rrightarrow \pre((M,I,O,\CC),C)$.
+Assume for all $M,I,O,\CC,C$, $C \Rrightarrow \post((M,I,O,\CC),C)$.
+\vend
+
+\vbeg
+Assume for any $M,I,O,\CC,C$, for any $V$,
+    $V \sats ((M,I,O,\CC) \hastype C)$
+  iff
+    {$V \sats \pre((M,I,O,\CC),C)$ implies that
+      for all $V'$,
+          $V \subseteq V'$ and {for all $K \in \CC$, $V' \sats K$}
+        implies that
+          $V' \sats \post((M,I,O,\CC),C)$}.
+\vend
+
+\vbeg
+Assume for any $V,V',C$, if $V \subseteq V'$ and $V \sats C$ then $V' \sats C$.
+Assume for any $V,C,C'$, if $C \Rrightarrow C'$ and $V \sats C$ then $V \sats C'$.
+Assume for any $V,C,C'$, $V \sats C$ and $V \sats C'$ iff $V \sats {C \cup C'}$.
+\vend
+
+\vbeg
+Assume for any $M,I,O,\CC,C$,
+    $((M,I,O,\CC) \hastype C)$ is strongly valid
+  iff
+    {for all $V \in I \rightarrow \N$,
+      $V \sats ((M,I,O,\CC) \hastype C)$}.
+\vend
+
+\vbeg
+Introduce the constants $\Conn, \Loop, \Hole$.
+\vend
+
+\vbeg
+Introduce the constant $\constraints$. Assume for any
+$\theta \in \XC \rightarrow \XC$, $\constraints(\theta)$ is a
+constraint set.
+\vend
+
+\vbeg
+Introduce the constants $\cn,\lp,\hl$.
+
+Assume for any $\CC, \CC', \theta$,
+  $\cn(\theta,\CC,\CC') = \{C \cup C' \cup \constraints(\theta) | C \in \CC, C' \in \CC'\}$.
+
+Assume for any $\CC, \theta$,
+  $\lp(\theta,\CC) = \{C \cup \constraints(\theta) | C \in \CC\}$.
+
+Assume for any $n,I,O,I',O',\CC$,
+  $\hl(n,I,O,I',O',\CC) =
+    \{C_i \cup \constraints(\phi) \cup \constraints(\psi) |
+      i \in \{0,\ldots,n\}, \phi \in I' \rightarrow I_i, \psi \in O_i \rightarrow O', C \in \CC\}$.
+\vend
+
+\vbeg
+Assume for any $V, \CC, \theta$,
+    {for all $K \in \lp(\theta,\CC)$, $V \sats K$}
+  implies that
+    {for all $K' \in \CC$, $V \sats K'$}.
+
+Assume for any $V,\CC,\CC',\theta$,
+    {for all $K \in \cn(\theta,\CC,\CC')$, $V \sats K$}
+  implies that
+    {for all $K' \in \CC$, $V \sats K'$} and {for all $K'' \in \CC'$, $V \sats K''$}.
+\vend
+
+\vbeg
+Introduce the constant $\vdash$.
+\vend
+
+\vbeg
+Assume for any $A,I,O,\CC,C,C'$,
+    $(A,I,O,C) \hastype C'$ is a typed module, and
+    $C \Rrightarrow C'$
+  implies that
+    $\vdash {(A,I,O,\{C\}) \hastype C'}$.
+\vend
+
+\vbeg
+Assume for any $M,I,O,\CC,C, N,I',O',\CC',C',\theta$, for all $I'',O'',C''$,
+    $\vdash {(M,I,O,\CC) \hastype C}$,
+    $\vdash {(N,I',O',\CC') \hastype C'}$,
+    $\theta \in O \rightarrow I'$, $\theta$ is injective,
+    $I'' = I \cup (I'-\ran(\theta))$,
+    $O'' = O' \cup (O - \dom(\theta))$,
+    $C'' = {C \cup C'} \upharpoonright {I'' \cup O''}$, and
+    $\post((M,I,O,\CC),C) \Rrightarrow {\pre((N,I',O',\CC'), C') \downharpoonright \ran(\theta)}$
+  implies that
+    $\vdash {(\Conn(\theta,M,N),I'', O'', \cn(\theta,\CC,\CC')) \hastype C''}$.
+\vend
+
+\vbeg
+Assume for any $M,I,O,\CC,C,\theta$, for all $I',O',C'$,
+    $\vdash {(M,I,O,\CC) \hastype C}$,
+    $\theta \in O \rightarrow I$, $\theta$ is injective, and
+    $I' = I-\ran(\theta)$,
+    $O' = O - \dom(\theta)$,
+    $C' = C \upharpoonright {I' \cup O'}$, and
+    $\pre((\Loop(\theta,M),I',O', \lp(\theta,\CC)), C') \Rrightarrow \pre((M,I,O,\CC), C)$
+  implies that
+    $\vdash {(\Loop(\theta,M),I',O', \lp(\theta,\CC)) \hastype C'}$.
+\vend
+
+\vbeg
+Assume for any $n,X,M,I,O,\CC,C$, for all $M',I',O',\CC',C'$,
+    {for all $i \in \{0,\ldots,n\}$,
+      $\vdash {(M_i,I_i,O_i,\CC_i) \hastype C_i}$,
+      {for all $\phi \in I' \rightarrow I_i, \psi \in O_i \rightarrow O'$,
+        $C' \cup \constraints(\phi) \cup \constraints(\psi) \LleftRrightarrow C_i$}},
+    $M' = \Hole(X, \{M_i | i \in \{0,\ldots,n\}\})$,
+    $\CC' = \hl(n,I,O,I',O', \CC)$,
+    ${\pre((M',I',O',\CC'),C')} \Rrightarrow {\post((M', I', O', \CC'), C')}$
+  implies that
+    $\vdash {(M', I', O', \CC') \hastype C'}$.
+\vend
+
+\vbeg
+Assume for any $M,I,O,\CC, C,C'$,
+    $\vdash {(M,I,O,\CC) \hastype C}$,
+    $\pre((M,I,O,\CC),C') \Rrightarrow \pre((M,I,O,\CC),C)$, and
+    $\post((M,I,O,\CC),C) \Rrightarrow \post((M,I,O,\CC),C')$
+  implies that
+    $\vdash {(M,I,O,\CC) \hastype C'}$.
+\vend
+
+\vbeg
+Assume for any $C,P,P'$, if $P \subseteq P'$ then ${{C \upharpoonright P'} \upharpoonright P} = {C \upharpoonright P}$.
+Assume for any $C,P,P'$, if $P \subseteq P'$ then ${\clo(C \upharpoonright P') \upharpoonright P} \Rrightarrow {\clo(C) \upharpoonright P}$.
+Assume for any $V,C,P,P'$, if $V \sats {C
+\downharpoonright P}$ and $V \sats {C \upharpoonright P'}$ then $V
+\sats {C \upharpoonright {P' \cup P}}$.
+\vend
+
+\vbeg
+Assert for any $A,I,O,C,C'$,
+    $(A,I,O,C), C'$ is a typed module and
+    $C \Rrightarrow C'$
+  implies that
+    for any $V$, if $V \sats \pre((A,I,O,\{C\}),C')$ then
+      for all $V'$ if $V \subseteq V'$ and {for all $K \in \{C\}$, $V' \sats K$} then
+        $V' \sats C$,
+        $C' \Rrightarrow \post((A,I,O,\{C\}), C')$, and
+        $V' \sats \post((A,I,O,\{C\}), C')$.
+\vend
+
+\vbeg
+Assert for any $M,I,O,\CC,C, N,I',O',\CC',C',\theta$, for all $I'',O'',C''$,
+    $I,O$ are sets, $I',O'$ are sets, $C$ is a constraint set, $C'$ is a constraint set,
+    $\parameters(C) \cap \parameters(C') = \emptyset$,
+    $\vdash {(M,I,O,\CC) \hastype C}$,
+    $\vdash {(N,I',O',\CC') \hastype C'}$,
+    $\theta \in O \rightarrow I'$, $\theta$ is injective,
+    $I'' = I \cup (I'-\ran(\theta))$,
+    $O'' = O' \cup (O - \dom(\theta))$,
+    $C'' = {C \cup C'} \upharpoonright {I'' \cup O''}$, and
+    $\post((M,I,O,\CC),C) \Rrightarrow {\pre((N,I',O',\CC'), C') \downharpoonright \ran(\theta)}$
+  implies that
+\vend
+
+\vbeg
+    for any $V$,
+      if $V \sats ((M,I,O,\CC) \hastype C)$ and $V \sats ((N,I',O',\CC') \hastype C')$ then
+        if $V \sats {\pre((\Conn(\theta,M,N), I'', O'', \cn(\theta,\CC,\CC')), C'')}$ then
+
+${\pre((\Conn(\theta,M,N), I'', O'', \cn(\theta,\CC,\CC')), C'')} = {\clo(C'') \upharpoonright I''}$,
+            $V \sats {\clo(C'') \upharpoonright I''}$,
+            $V \sats {\clo({C \cup C'} \upharpoonright {I'' \cup O''}) \upharpoonright I''}$,
+
+${\clo({C \cup C'} \upharpoonright {I'' \cup O''}) \upharpoonright I''} \Rrightarrow {\clo(C \cup C') \upharpoonright I''}$,
+            $V \sats {\clo(C \cup C') \upharpoonright I''}$,
+          $ {\clo(C \cup C') \upharpoonright I''} \Rrightarrow {\clo(C) \upharpoonright I}$,
+            $V \sats {\clo(C) \upharpoonright I}$,
+          $\pre((M,I,O,\CC),C) = {\clo(C) \upharpoonright I}$,
+            $V \sats \pre((M,I,O,\CC),C)$,
+
+    for all $V'$, if $V \subseteq V'$ and {for all $K' \in \cn(\theta,\CC,\CC')$, $V' \sats K'$} then
+        {for all $K' \in \CC$, $V' \sats K'$} ,
+        $V' \sats \post((M,I,O,\CC),C)$,
+        $V' \sats {\pre((N,I',O',\CC'), C') \downharpoonright \ran(\theta)}$,
+      $\pre((N,I',O',\CC'), C') ={\clo(C') \upharpoonright I'}$,
+        $V' \sats {{\clo(C') \upharpoonright I'} \downharpoonright \ran(\theta)}$,
+      ${\clo(C') \upharpoonright I''} \Rrightarrow {\clo(C') \upharpoonright (I'-\ran(\theta))} $,
+      ${\clo(C \cup C') \upharpoonright I''} \Rrightarrow {\clo(C') \upharpoonright I''} $,
+        $V' \sats {\clo(C') \upharpoonright (I'-\ran(\theta))}$,
+      $ {I' - \ran(\theta)} \subseteq I'$,
+      $ {{\clo(C') \upharpoonright I'} \upharpoonright (I'-\ran(\theta))} = {\clo(C') \upharpoonright (I'-\ran(\theta))}$,
+        $V' \sats {{\clo(C') \upharpoonright I'} \upharpoonright (I'-\ran(\theta))}$,
+      $ {(I'-\ran(\theta)) \cup \ran(\theta)} = I'$,
+        $V' \sats {{\clo(C') \upharpoonright I'} \upharpoonright {(I'-\ran(\theta)) \cup  {\ran(\theta)}}}$,
+        $V' \sats {{\clo(C') \upharpoonright I'} \upharpoonright I'}$,
+        $V' \sats {\clo(C')  \upharpoonright I'}$,
+        $V' \sats \pre((N,I',O',\CC'),C')$,
+        $V' \sats {(N,I',O',\CC') \hastype C'}$,
+
+    for all $V''$, if $V' \subseteq V''$ then
+        {for all $K'' \in \CC'$, $V' \sats K''$ and $V'' \sats K''$}, {for all $K' \in \CC'$, $V'' \sats K'$},
+        $V'' \sats \post((M,I,O,\CC),C)$,
+        $V'' \sats \post((N,I',O',\CC'),C')$,
+      $\post((M,I,O,\CC),C) = \clo(C) \downharpoonright O$,
+      $\post((N,I',O',\CC'),C') = \clo(C') \downharpoonright O'$,
+        $V'' \sats {\clo(C) \downharpoonright O}$,
+        $V'' \sats {\clo(C') \downharpoonright O'}$,
+        $V'' \sats {{\clo(C) \downharpoonright O} \cup {\clo(C') \downharpoonright O'}}$,
+      ${\clo(C) \downharpoonright O} \cup {\clo(C') \downharpoonright O'} = {{\clo(C) \cup \clo(C')} \downharpoonright {O \cup O'}}$,
+        $V'' \sats {{\clo(C) \cup \clo(C')} \downharpoonright {O \cup O'}}$,
+      $\clo(C \cup C') = {\clo(C) \cup \clo(C')} $,
+        $V'' \sats {\clo(C \cup C') \downharpoonright {O \cup O'}}$,
+      $C \cup C' \subseteq \clo(C \cup C')$,
+      ${C \cup C'} \upharpoonright {I'' \cup O''} \subseteq  {C \cup C'}$,
+      $O'' \subseteq {O \cup O'}$, $C'' \subseteq {C \cup C'}$,
+      $\clo(C'') \subseteq \clo({C \cup C'})$,
+      $  {\clo(C \cup C') \downharpoonright {O \cup O'}} \Rrightarrow {\clo(C'') \downharpoonright O''}$,
+      ${\post((\Conn(\theta,M,N), I'', O'', \cn(\theta,\CC,\CC')), C'')} = {\clo(C'') \downharpoonright O''}$,
+        $V'' \sats {\post((\Conn(\theta,M,N), I'', O'', \cn(\theta,\CC,\CC')), C'')}$.
+\vend
+
+\vbeg
+Assert for any $M,I,O,\CC,C,\theta$, for all $I',O',C'$,
+    $M,I,O,C,I',O',C'$ are sets,
+    $\vdash {(M,I,O,\CC) \hastype C}$,
+    $\theta \in O \rightarrow I$, $\theta$ is injective, and
+    $I' = I - \ran(\theta)$,
+    $O' = O - \dom(\theta)$,
+    $C' = C \upharpoonright {I' \cup O'}$, and
+    $\pre((\Loop(\theta,M),I',O', \lp(\theta,\CC)), C') \Rrightarrow \pre((M,I,O,\CC), C)$
+  implies that
+
+    for any $V$,
+      if $V \sats ((M,I,O,\CC) \hastype C)$ then
+        if $V \sats \pre((\Loop(\theta,M),I',O',\lp(\theta,\CC)),C')$ then
+          $V \sats \pre((M,I,O,\CC), C)$,
+          for all $V'$,
+            if $V \subseteq V'$ and {for all $K' \in \lp(\theta,\CC)$, $V' \sats K'$} then
+                {for all $K \in \CC$, $V' \sats K$},
+                $V' \sats \post((M,I,O,\CC), C)$,
+              $\post((M,I,O,\CC), C) = {\clo(C) \downharpoonright O}$,
+                $V' \sats {\clo(C) \downharpoonright O}$,
+              ${O - \dom(\theta)} \subseteq O$,
+              $C \upharpoonright {I' \cup O'} \subseteq C$,
+              ${\clo(C) \downharpoonright O} \Rrightarrow {\clo(C') \downharpoonright O'}$,
+              $\post((\Loop(\theta,M),I',O', \lp(\theta,\CC)), C') = {\clo(C') \downharpoonright O'}$,
+                $V' \sats {\clo(C') \downharpoonright O'}$,
+                $V' \sats \post((\Loop(\theta,M),I',O', \lp(\theta,\CC)), C')$.
+\vend
+
+\vbeg
+Assert for any $n,X,M,I,O,\CC,C$, for all $M',I',O',C',\CC'$,
+    {for all $i \in \{0,\ldots,n\}$,
+      $\vdash {(M_i,I_i,O_i,\CC_i) \hastype C_i}$,
+    {for all $\phi \in I' \rightarrow I_i, \psi \in O_i \rightarrow O'$,
+    $C' \cup \constraints(\phi) \cup \constraints(\psi) \LleftRrightarrow C_i$}},
+    $M' = \Hole(X, \{M_i | i \in \{0,\ldots,n\}\})$,
+    $\CC' = \hl(n,I,O,I',O', \CC)$,
+    ${\pre((M',I',O',\CC'),C')} \Rrightarrow {\post((M',I',O',\CC'), C')}$
+  implies that
+    for any $V$, if $V \sats (M', I', O', \CC') \hastype C'$ then
+          $V \sats \pre((M',I',O',\CC'), C')$
+        implies that
+          $V \sats \post((M', I', O', \CC'), C')$,
+          for all $V'$,
+            if $V \subseteq V'$ and {for all $K \in \hl(n,I,O,I',O', \CC)$, $V' \sats K$} then
+              $V' \sats \post((M',I',O',\CC'), C')$.
+\vend
+
+\vbeg
+Assert for any $M,I,O,\CC,C,C'$,
+    $(M,I,O,\CC) \hastype C$,
+    $\pre((M,I,O,\CC),C') \Rrightarrow \pre((M,I,O,\CC),C)$, and
+    $\post((M,I,O,\CC),C) \Rrightarrow \post((M,I,O,\CC),C')$
+  implies that
+    for any $V$,
+      if $V \sats ((M,I,O,\CC) \hastype C)$ then
+        $V \sats \pre((M,I,O,\CC),C')$
+      implies that
+        $V \sats \pre((M,I,O,\CC), C)$ and
+        for all $V'$,
+          if $V \subseteq V'$ and {for all $K \in \CC$, $V' \sats K$} then
+            $V' \sats \post((M,I,O,\CC),C)$,
+            $V' \sats \post((M,I,O,\CC),C')$.
+\vend
