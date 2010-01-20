@@ -8,8 +8,6 @@
 	Assume $2$ is even.
 	Assume $2$ is prime.
 	Assume $\emptyset$ is a finite set.
-	Assume $\emptyset$ is a finite set.
-	Assume $\emptyset$ is a finite set.
 	Assume $\emptyset$ is a set.
 	Assume $\N \subset \Z$.
 	Assume $\N$ is a set.
@@ -26,6 +24,13 @@
 	Assume $\Z$ is a set.
 	Assume $\Z$ is an infinite set.
 	Assume $\{0,1\} \subset \N$.
+	Assume considering $(-1*x)+x$, if $x \in \R$ then $(-1*x)+x = 0$.
+	Assume considering $(-x)+x$, if $x \in \R$ then $(-x)+x = 0$.
+	Assume considering $(x*y)*z$, if $x \in \R$, $y \in \R$, $z \in \R$ then $x*(y*z) = (x*y)*z$.
+	Assume considering $(x*z)+(y*z)$, $x \in \R$, $y \in \R$, $z \in \R$ implies $(x*z)+(y*z) = (x+y)*z$.
+	Assume considering $(x+y)*z$, $x \in \R$, $y \in \R$, $z \in \R$ implies that $(x+y)*z = x*z + y*z$.
+	Assume considering $(z*x)+(z*y)$, $x \in \R$, $y \in \R$, $z \in \R$ implies $(z*x)+(z*y) = z*(x+y)$.
+	Assume considering $-1*x$, if $x \in \R$ then $-1*x = -x$.
 	Assume considering $n/2$, $n$ is even implies $n/2 \in \Z$.
 	Assume considering $x * y$, if $x$ is composite, $y \in \Z$, and $y \neq 0$ then $x * y$ is composite.
 	Assume considering $x * y$, if $y$ is composite, $x \in \Z$, and $x \neq 0$ then $x * y$ is composite.
@@ -48,10 +53,13 @@
 	Assume considering $x \cdot y$, $x$ is positive and $y$ is negative implies $x \cdot y$ is negative.
 	Assume considering $x \cdot y$, $x$ is positive and $y$ is positive implies $x \cdot y$ is positive.
 	Assume considering $X \cup Y$, if $X$ is a set and $Y$ is a set then $X \cup Y$ is a set.
+	Assume considering $x \mod y$, $x \in \Z$ and $y \in \Z$ implies that $x \mod y \in \Z$.
 	Assume considering $X \rightarrow Y$, $X$ is a set and $Y$ is a set implies that $X \rightarrow Y$ is a set.
 	Assume considering $X \times Y$, $X$ is a finite set and $Y$ is a finite set implies $X \times Y$ is a finite set.
-	Assume considering $X \times Y$, $X$ is a finite set and $Y$ is a finite set implies $X \times Y$ is a finite set.
 	Assume considering $X \times Y$, $X$ is a set and $Y$ is a set implies that $X \times Y$ is a set.
+	Assume considering $x*(y*z)$, if $x \in \R$, $y \in \R$, $z \in \R$ then $x*(y*z) = (x*y)*z$.
+	Assume considering $x+(-1*x)$, if $x \in \R$ then $x+(-1*x) = 0$.
+	Assume considering $x+(-x)$, if $x \in \R$ then $x+(-x) = 0$.
 	Assume considering $x+y$, $x \in \Q$  and $y \in \Q$  implies that $x + y \in \Q$.
 	Assume considering $x+y$, $x \in \Z$  and $y \in \Z$ implies that $x + y \in \Z$.
 	Assume considering $x+y$, $x$ is even and $y$ is even implies $x+y$ is even.
@@ -63,6 +71,7 @@
 	Assume considering $x+y$, if $x \geq 0$ and $y \geq 0$ then $x+y \geq x$ and $x+y \geq y$.
 	Assume considering $x+y$, if $x \in \N$ and $y \in \N$ then $x+y \in \N$.
 	Assume considering $x+y$, if $x \in \R$ and $y \in \R$ then $x+y \in \R$.
+	Assume considering $x-x$, if $x \in \R$ then $x-x=0$.
 	Assume considering $x-y$, $x \geq y$ implies that $x - y \geq 0$.
 	Assume considering $x-y$, $x \in \N$, $y \in \N$, and $x \geq y$ implies $x-y \in \N$.
 	Assume considering $x-y$, $x \in \Q$  and $y \in \Q$ implies that $x - y \in \Q$.
@@ -77,6 +86,7 @@
 	Assume considering $x^y$, if $x \in \N$ and $y \in \N$ then $x^y \in \N$.
 	Assume considering $x^y$, if $x \in \Z$ and $y \in \N$ then $x^y \in \Z$.
 	Assume considering $x^y$, if $x \in \Z$ and $y \in \Z$ then \l{$x^y$ is a power of $x$}.
+	Assume considering $z*(x + y)$, $x \in \R$ and $y \in \R$ and $z \in \R$ implies that $z*(x + y) = z*x + z*y$.
 	Assume considering $\lceil x \rceil$, $x \in \R$ implies that $\lceil x \rceil \in \Z$ and $\lceil x \rceil \geq x$.
 	Assume considering $\lceil x \rceil$, $x \in \Z$ implies that $\lceil x \rceil = x$.
 	Assume considering $\lfloor x \rfloor$, $x \in \R$ implies that $\lfloor x \rfloor \in \Z$ and $\lfloor x \rfloor \leq x$.
@@ -159,6 +169,7 @@
 	Assume for any $x$, $x \in \emptyset$ implies that there is a contradiction.
 	Assume for any $x$, $x \in \R$ implies $|x| \geq 0$.
 	Assume for any $X$, $X$ is a finite set iff $|X| \in \N$.
+	Assume for any $x$, if $x \in \R$ then $-x \in \R$.
 	Assume for any $x$, if $x \in \Z$ then \l{$x$ is one more than $x-1$}.
 	Assume for any $x$, if $x \in \Z$ then \l{$x+1$ is one more than $x$}.
 	Assume for any $X$, if $X$ is a finite set then $\powerset(X)$ is a finite set.

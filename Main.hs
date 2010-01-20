@@ -28,6 +28,12 @@ import Validation (validate)
 import ContextOntology (ont)
 
 ----------------------------------------------------------------
+-- The target of the output, as specified by the command-line
+-- arguments.
+
+data OutputTarget = CmdLine | File String
+
+----------------------------------------------------------------
 -- Takes a file path in the form of a string, try to parse the
 -- file into an abstract syntax, and run it.
 
@@ -35,15 +41,23 @@ showTD td = "(completed in "++
   (show$floor(((toRational$tdSec td)*(toRational$10^12)+
     (toRational$tdPicosec td))/10^9))++"ms)\n"
 
-process :: OutputFormat -> String -> String -> IO ()
-process oFmt fname txt =
+process :: OutputFormat -> OutputTarget -> Bool -> String -> String -> IO ()
+process oFmt out stat fname txt =
+  let (cr,wr) = case out of
+        CmdLine -> (putStr "", putStr)
+        File outf -> (writeFile outf "", appendFile outf)
+  in
   do { --ont <- readFile "ontology"
      ; ont <- parseP program "<ontology>" ont
      ; t0 <- getClockTime
      ; stmts <- parseP program fname txt
-     ; putStr $ showStmts oFmt $ validate ont stmts
+     ; cr
+     ; wr $ fmt oFmt "output" $ showStmts oFmt $ validate ont stmts
      ; t1 <- getClockTime
-     ; putStr $ fmt oFmt "ignore" $ "\n"++showTD (diffClockTimes t1 t0)
+     ; if stat then 
+         wr $ fmt oFmt "output" $ fmt oFmt "ignore" $ "\n"++showTD (diffClockTimes t1 t0)
+       else
+         return ()
      }
 
 processSql :: String -> IO ()
@@ -54,14 +68,18 @@ processSql str =
          _ -> "Error: SQL conversion failed."
      }
 
-procCmd :: OutputFormat -> Bool -> [String] -> IO ()
-procCmd _ _ ["-sqlexp", expStr] = processSql expStr
-procCmd oFmt lit ("-lit":args) = procCmd oFmt True args
-procCmd _ lit ("-html":args) = procCmd htmlOutFmt lit args
-procCmd _ lit ("-ansi":args) = procCmd ansiOutFmt lit args
-procCmd oFmt lit [s] = if lit then process oFmt "" s
-                       else do { t<-readFile s; process oFmt s t}
-procCmd _ _ _ = putStr $ showStmt noneOutFmt $ SystemError 
+cmd :: OutputFormat -> [Bool] -> OutputTarget -> [String] -> IO ()
+cmd _    _   out ["-sqlexp", expStr] = processSql expStr
+cmd oFmt [_,stat] out ("-lit":args) = cmd oFmt [True,stat] out args
+cmd oFmt [lit,_] out ("-stat":args) = cmd oFmt [lit,True] out args
+cmd _    fls out ("-o":f:args) = cmd htmlOutFmt fls (File f) args
+cmd _    fls out ("-html":args) = cmd htmlOutFmt fls out args
+cmd _    fls out ("-cmdhtml":args) = cmd cmdHtmlOutFmt fls out args
+cmd _    fls out ("-ansi":args) = cmd ansiOutFmt fls out args
+cmd oFmt [lit,stat] out [s] =
+  if lit then process oFmt out stat "" s
+  else do {t<-readFile s; process oFmt out stat s t}
+cmd _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError 
                 "usage:\taa [-html|-ansi] \"path/file.ext\"\n\n"
 
 ----------------------------------------------------------------
@@ -70,7 +88,7 @@ procCmd _ _ _ = putStr $ showStmt noneOutFmt $ SystemError
 main :: IO ()
 main =
   do{ args <- getArgs
-    ; procCmd noneOutFmt False args
+    ; cmd noneOutFmt [False,False] CmdLine args
     }
 
 --eof

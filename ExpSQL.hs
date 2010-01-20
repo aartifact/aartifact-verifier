@@ -128,6 +128,11 @@ cnv eix pix oix min0 vs (Exp (App (C (Brack Bar Bar)) e)) =
       (vs'', _, min3') = dof eix pix oix min0 min3 "Brack Bar Bar" "null" "false" vs3
   in (vs'', eix3+1, min3')
 
+cnv eix pix oix min0 vs (Exp (App (C Neg) e)) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "-", Exp e]
+      (vs'', _, min3') = dof eix pix oix min0 min3 "Neg" "null" "false" vs3
+  in (vs'', eix3+1, min3')
+
 cnv eix pix oix min0 vs (Exp (App (C Ceil) e)) =
   let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "\\lceil", Exp e, Syn "\\rceil"]
       (vs'', _, min3') = dof eix pix oix min0 min3 "Ceil" "null" "false" vs3

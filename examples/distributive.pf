@@ -1,0 +1,18 @@
+This is a simple example of a verifiable proof script. We define
+addition and multiplication for vectors in $\R^2$ and then prove
+that multiplication is distributive with respect to scalar
+addition.
+
+\vbeg
+Assume for all $x,y,x',y' \in \R$, $(x,y) + (x',y') = (x+x',y+y')$.
+Assume for all $a,x,y \in \R$, $a * (x,y) = (a*x, a*y)$.
+
+Assert for all $a,b,x,y \in \R$,
+  $(a + b) * (x,y) = ((a+b)*x, (a+b)*y)$,
+  $((a+b)*x, (a+b)*y) = (a*x + b*x, a*y + b*y)$,
+  $(a*x + b*x, a*y + b*y) = (a*x, a*y) + (b*x, b*y)$,
+  $(a*x, a*y) = a*(x,y)$,
+  $(b*x, b*y) = b*(x,y)$,
+  $(a*x, a*y) + (b*x, b*y) = a*(x,y) + b*(x,y)$,
+  $(a + b) * (x,y) = a*(x,y) + b*(x,y)$.
+\vend
