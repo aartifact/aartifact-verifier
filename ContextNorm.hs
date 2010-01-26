@@ -44,13 +44,14 @@ normsToCheck =
  , normRec multNorm1 (normNoP plusNorm Plus Times)
  ]
 
-allNorms rs (e@(App (C Eql) (T[e1,e2]))) = allNorms' e
-  --if (chkRels rs (bOp In e1 (C SetR)) && chkRels rs (bOp In e2 (C SetR))) then allNorms' e else allNorms' e
+allNorms rs (e@(App (C Eql) (T[e1,e2]))) =
+  if (chkRels rs (bOp In e1 (C SetR)) && chkRels rs (bOp In e2 (C SetR))) then allNorms' e else []
 allNorms rs (e@(Forall ns (App (C Eql) (T[e1,e2])))) = [(Forall ns  (App (C Eql) (T[e2,e1])))]
 allNorms rs (Forall ns (App (C Imp) (T[e0, (App (C Eql) (T[e1,e2]))]))) = [(Forall ns (App (C Imp) (T[e0, (App (C Eql) (T[e2,e1]))])))]
 allNorms rs _ = []
 
-allNorms' (e@(App (C Eql) (T[e1,e2]))) = [n e | n <- normsToCheck] ++ (if simpPlusEqnChk e then [C(B True)] else [])
+allNorms' (e@(App (C Eql) (T[e1,e2]))) = [n e | n <- normsToCheck ] --normsToCheck] 
+                                          ++ (if simpPlusEqnChk e then [C(B True)] else [])
 allNorms' _ = []
 
 simpPlusEqnChk (App (C Eql) (T [e1,e2])) =
