@@ -30,10 +30,36 @@ import ContextLit
 ----------------------------------------------------------------
 -- Representation of simulated natural context.
 
-type Context = (VC,Relations)
+type Context = (VC,Relations,Stat)
 
 state0 :: [Exp] -> Context
-state0 ontology = (([],(0,[])), empRels ontology)
+state0 ontology = (([],(0,[])), empRels ontology, stat0)
+
+----------------------------------------------------------------
+-- The "Stat" component represents statistics accumulated during
+-- the simulation process.
+
+type Stat = [[Integer]]
+
+statCxt :: Context -> Stat
+statCxt (_,_,s) = s
+
+stat0 :: Stat
+stat0 = [[],[],[]]
+
+updStat ::  Stat -> Context -> Context
+updStat s' (v,r,s) = (v,r,s')
+
+updRelStat :: Relations -> Stat -> Stat
+updRelStat (_,eqs',hg') [is,js,ks] =
+  let (eqDomSz, eqRanSz) = eqvSize eqs' in
+  [hgSize hg':is, eqDomSz:js, eqRanSz:ks]
+
+shStats :: Stat -> String
+shStats [is,js,ks] = shStats' is js ks where
+  shStats' [] [] [] = ""
+  shStats' (i:is) (j:js) (k:ks) = shStats' is js ks
+           ++ "\n" ++ show i ++ "\t" ++ show j ++ "\t" ++ show k
 
 ----------------------------------------------------------------
 -- The "VC" component represents the variables and constants
@@ -42,21 +68,21 @@ state0 ontology = (([],(0,[])), empRels ontology)
 type VC = ([Name], (Integer,[Name]))
 
 varsCxt :: Context -> [Name]
-varsCxt ((b,_),_) = b
+varsCxt ((b,_),_,_) = b
 
 -- Make expression variables unique.
 freshExpVars :: Exp -> Context -> (Exp, Context)
-freshExpVars e ((b,(c,gs)),rs) = (e',((b,(c',gs)),rs))
+freshExpVars e ((b,(c,gs)),rs,stat) = (e',((b,(c',gs)),rs,stat))
   where (e',c') = uv [] c e
 
 -- For "hiding" propositions that no longer apply because
 -- bound variables have been hidden by a new quantifier.
 updVars :: [Name] -> Context -> Context
-updVars vs ((b,c),rs) = ((b \/ vs,c), clearVars f rs)
+updVars vs ((b,c),rs,stat) = ((b \/ vs,c), clearVars f rs,stat)
   where f e = (fv (b `diff` vs) e) /\ vs == []
 
 updConsts :: [Name] -> Context -> Context
-updConsts vs ((b,c),rs) = ((b,c), clearVars f rs)
+updConsts vs ((b,c),rs,stat) = ((b,c), clearVars f rs,stat)
   where f e = (fv (b `diff` vs) e) /\ vs == []
 
 clearVars :: (Exp -> Bool) -> Relations -> Relations
@@ -73,27 +99,27 @@ empRels laws = foldl updRels (foldl addLaw init laws) laws
   where init = ([Aux1 []], snd $ ixsEqv [C$B True] empEquiv, empHG)
 
 trueExpsCxt :: Context -> [Exp]
-trueExpsCxt (_,(_,eqs,_)) =  getByIx i eqs
+trueExpsCxt (_,(_,eqs,_),_) =  getByIx i eqs
   where ([i],_) = ixsEqv [C (B True)] eqs
 
 eqCxt :: Context -> Exp -> Exp -> Bool
-eqCxt (_,(_,eqs,_)) e1 e2 = eqChkZ 0 eqs e1 e2
+eqCxt (_,(_,eqs,_),_) e1 e2 = eqChkZ 0 eqs e1 e2
 
 assertCxt :: Context -> Exp -> Bool
-assertCxt (_,rs) e = chkRels rs e
+assertCxt (_,rs,_) e = chkRels rs e
 
 assumeCxt :: Exp -> Context -> Context
 assumeCxt e s = foldl each s $ splitAnd e where
-  each s e = (vcs', updRelsTrue (updRels rs' e) e)
-    where (vcs',rs') = considerCxt e s
+  each s e = (vcs', updRelsTrue (updRels rs' e) e, stat')
+    where (vcs',rs',stat') = considerCxt e s
 
 considerCxt :: Exp -> Context -> Context
-considerCxt e (vcs,(aux0,eqs0,hg0)) =
+considerCxt e (vcs,(aux0,eqs0,hg0),stat) =
   let (_,eqs0') = ixsEqv (subs e) eqs0
       rs = (aux0,eqs0',resetMarksHG hg0) --addLaw (aux0,eqs0',resetMarksHG hg0) e
       pr f rs = foldr f rs (subs e) --Subexps. occur later in list.
-      rs' = foldr pr rs [considRels,considAux1,considNorm,considEval,considLit]
-  in (vcs,closureRels rs')
+      rs' = foldr pr rs [considRels,considNorm,considAux1,considEval,considLit]
+  in (vcs,closureRels rs',updRelStat rs' stat)
 
 addLaw :: Relations -> Exp -> Relations
 addLaw rs e = foldr (\add rs-> add rs e) rs [addAuxLaw,addRelLaw]

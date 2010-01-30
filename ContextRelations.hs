@@ -95,7 +95,7 @@ considRels (e0@(App (C (NLPredLC _)) (T es))) (aux,eqs,rs) =
   in foldr considRels' (aux,eqs',rs) es
 
 considRels (e0@(App (C c) (T es))) (aux,eqs,rs) =
-  if c `elem` [Pow,Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,SetExplicit] then
+  if c `elem` [Pow,Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,SetExplicit,GCF,LCM] then
     let (i1:is, eqs') = ixsEqv ([e0]++es) eqs
         ls = if c==SetExplicit then [(In, [j,i1]) | j <- is] else []
         rs' = (ls++[(SLC Eql c, i1:is)]) |=> (aux,eqs', rs)

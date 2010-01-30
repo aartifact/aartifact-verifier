@@ -25,6 +25,7 @@ import IOSource
 import IOPrintFormat
 import ExpSQL (expSql)
 import Validation (validate)
+import Context (shStats)
 import ContextOntology (ont)
 
 ----------------------------------------------------------------
@@ -52,10 +53,14 @@ process oFmt out stat fname txt =
      ; t0 <- getClockTime
      ; stmts <- parseP program fname txt
      ; cr
-     ; wr $ fmt oFmt "output" $ showStmts oFmt $ validate ont stmts
+     ; (ss',stadat) <- return $ validate ont stmts
+     ; wr $ fmt oFmt "output" $ showStmts oFmt $ ss'
      ; t1 <- getClockTime
      ; if stat then 
-         wr $ fmt oFmt "output" $ fmt oFmt "ignore" $ "\n"++showTD (diffClockTimes t1 t0)
+         writeFile "stat.dat" $ 
+         --fmt oFmt "output" $ 
+         --fmt oFmt "ignore" $ 
+         (("\n"++showTD (diffClockTimes t1 t0))++("\n"++shStats stadat))
        else
          return ()
      }

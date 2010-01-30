@@ -184,7 +184,8 @@ expNoAppP =
 
 expAtom :: Parse Exp
 expAtom = 
-     try (bracks "|" "|" (Brack Bar Bar) expP)
+     try (bracks "||" "||" VectorNorm expP)
+ <|> try (bracks "|" "|" (Brack Bar Bar) expP)
  <|> bracks "\\lceil" "\\rceil" Ceil expP
  <|> bracks "\\lfloor" "\\rfloor" Floor expP
  <|> angles "\\langle" "\\rangle" (Brack Round Round) expP

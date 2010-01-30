@@ -14,6 +14,12 @@
 	Assume $\N$ is an infinite set.
 	Assume $\nofix{*} \in \R \times \R \rightarrow \R$.
 	Assume $\nofix{+} \in \R \times \R \rightarrow \R$.
+	Assume $\nofix{<}$ is a relational operator.
+	Assume $\nofix{=}$ is a relational operator.
+	Assume $\nofix{>}$ is a relational operator.
+	Assume $\nofix{\geq}$ is a relational operator.
+	Assume $\nofix{\leq}$ is a relational operator.
+	Assume $\nofix{\neq}$ is a relational operator.
 	Assume $\Q \subset \R$.
 	Assume $\Q$ is a set.
 	Assume $\Q$ is an infinite set.
@@ -27,15 +33,19 @@
 	Assume considering $(-1*x)+x$, if $x \in \R$ then $(-1*x)+x = 0$.
 	Assume considering $(-x)+x$, if $x \in \R$ then $(-x)+x = 0$.
 	Assume considering $(x*y)*z$, if $x \in \R$, $y \in \R$, $z \in \R$ then $x*(y*z) = (x*y)*z$.
+	Assume considering $(x*y)^z$, $x \in \R$, $y \in \R$, and $z \in \R$ implies that $(x*y)^z = (x^z) * (y^z)$.
 	Assume considering $(x*z)+(y*z)$, $x \in \R$, $y \in \R$, $z \in \R$ implies $(x*z)+(y*z) = (x+y)*z$.
 	Assume considering $(x+y)*z$, $x \in \R$, $y \in \R$, $z \in \R$ implies that $(x+y)*z = x*z + y*z$.
 	Assume considering $(z*x)+(z*y)$, $x \in \R$, $y \in \R$, $z \in \R$ implies $(z*x)+(z*y) = z*(x+y)$.
+	Assume considering $(\log_b x) + (\log_b y)$, $b > 0$, $x > 0$, and $y > 0$ implies $\log_b(x*y) = (\log_b x) + (\log_b y)$.
 	Assume considering $-1*x$, if $x \in \R$ then $-1*x = -x$.
 	Assume considering $n/2$, $n$ is even implies $n/2 \in \Z$.
 	Assume considering $x * y$, if $x$ is composite, $y \in \Z$, and $y \neq 0$ then $x * y$ is composite.
 	Assume considering $x * y$, if $y$ is composite, $x \in \Z$, and $x \neq 0$ then $x * y$ is composite.
 	Assume considering $X - Y$, $X$ is a set and $Y$ is a set implies $X - Y \subseteq X$.
+	Assume considering $X \cap Y$, $X$ is a set and $Y$ is a set implies $X \cap Y = Y \cap X$.
 	Assume considering $X \cap Y$, if $X$ is a set and $Y$ is a set then $X \cap Y$ is a set.
+	Assume considering $X \cap \emptyset$, $X$ is a set implies $X \cap \emptyset = \emptyset$.
 	Assume considering $x \cdot (y/x)$, $x \in \R$, $y \in \R$, and $x \neq 0$ implies that $x \cdot (y/x) = y$.
 	Assume considering $x \cdot y$, $x \in Z$ and $y$ is even implies $x \cdot y$ is even.
 	Assume considering $x \cdot y$, $x \in \N$  and $y \in \N$ implies that $x \cdot y \in \N$.
@@ -52,15 +62,19 @@
 	Assume considering $x \cdot y$, $x$ is odd and $y$ is odd implies $x \cdot y$ is odd.
 	Assume considering $x \cdot y$, $x$ is positive and $y$ is negative implies $x \cdot y$ is negative.
 	Assume considering $x \cdot y$, $x$ is positive and $y$ is positive implies $x \cdot y$ is positive.
+	Assume considering $X \cup Y$, $X$ is a set and $Y$ is a set implies $X \cup Y = Y \cup X$.
 	Assume considering $X \cup Y$, if $X$ is a set and $Y$ is a set then $X \cup Y$ is a set.
+	Assume considering $X \cup \emptyset$, $X$ is a set implies $X \cup \emptyset = X$.
 	Assume considering $x \mod y$, $x \in \Z$ and $y \in \Z$ implies that $x \mod y \in \Z$.
 	Assume considering $X \rightarrow Y$, $X$ is a set and $Y$ is a set implies that $X \rightarrow Y$ is a set.
 	Assume considering $X \times Y$, $X$ is a finite set and $Y$ is a finite set implies $X \times Y$ is a finite set.
 	Assume considering $X \times Y$, $X$ is a set and $Y$ is a set implies that $X \times Y$ is a set.
 	Assume considering $x*(y*z)$, if $x \in \R$, $y \in \R$, $z \in \R$ then $x*(y*z) = (x*y)*z$.
+	Assume considering $x*y$, $x \in \R$ and $y \in \R$ implies $x*y = y*x$.
 	Assume considering $x+(-1*x)$, if $x \in \R$ then $x+(-1*x) = 0$.
 	Assume considering $x+(-x)$, if $x \in \R$ then $x+(-x) = 0$.
 	Assume considering $x+y$, $x \in \Q$  and $y \in \Q$  implies that $x + y \in \Q$.
+	Assume considering $x+y$, $x \in \R$ and $y \in \R$ implies $x+y = y+x$.
 	Assume considering $x+y$, $x \in \Z$  and $y \in \Z$ implies that $x + y \in \Z$.
 	Assume considering $x+y$, $x$ is even and $y$ is even implies $x+y$ is even.
 	Assume considering $x+y$, $x$ is even and $y$ is odd implies $x+y$ is odd.
@@ -87,11 +101,15 @@
 	Assume considering $x^y$, if $x \in \Z$ and $y \in \N$ then $x^y \in \Z$.
 	Assume considering $x^y$, if $x \in \Z$ and $y \in \Z$ then \l{$x^y$ is a power of $x$}.
 	Assume considering $z*(x + y)$, $x \in \R$ and $y \in \R$ and $z \in \R$ implies that $z*(x + y) = z*x + z*y$.
+	Assume considering $\emptyset \cap X$, $X$ is a set implies $\emptyset \cap X = \emptyset$.
+	Assume considering $\emptyset \cup X$, $X$ is a set implies $\emptyset \cup X = X$.
 	Assume considering $\lceil x \rceil$, $x \in \R$ implies that $\lceil x \rceil \in \Z$ and $\lceil x \rceil \geq x$.
 	Assume considering $\lceil x \rceil$, $x \in \Z$ implies that $\lceil x \rceil = x$.
 	Assume considering $\lfloor x \rfloor$, $x \in \R$ implies that $\lfloor x \rfloor \in \Z$ and $\lfloor x \rfloor \leq x$.
 	Assume considering $\lfloor x \rfloor$, $x \in \Z$ implies that $\lfloor x \rfloor = x$.
 	Assume considering $\log x$, if $x > 0$ then $\log x \in \R$.
+	Assume considering $\log_b (b^x)$, $b > 0$, $x \in \R$, and $x \geq 0$ implies $\log_b(b^x) = x$.
+	Assume considering $\log_b (x*y)$, $b > 0$, $x > 0$, and $y > 0$ implies $\log_b(x*y) = (\log_b x) + (\log_b y)$.
 	Assume considering $\log_b x$, if $x > 0$ and $b > 0$ then $\log_b x \in \R$.
 	Assume considering $\max S$, if $S$ is a finite set and $S \subset \R$ then $\max S \in S$.
 	Assume considering $\min S$, if $S$ is a finite set and $S \subset \R$ then $\min S \in S$.
@@ -137,9 +155,12 @@
 	Assume for all $x,y$, $x > y$ implies $x \neq y$.
 	Assume for all $x,y$, $x \leq y$ and $x \geq y$ implies $x = y$.
 	Assume for all $x,y$, $x \leq y$ iff $y \geq x$.
+	Assume for all $x,y$, $x \neq y$ and $x \geq y$ implies $x > y$.
+	Assume for all $x,y$, $x \neq y$ and $x \leq y$ implies $x < y$.
 	Assume for all $x,y$, if $x < y$ then $x - y < 0$.
 	Assume for all $x,y$, if $x > y$ then $x - y > 0$.
 	Assume for all $X,Y$, if $X \subset Y$ then $X \subseteq Y$.
+	Assume for all $x,y$, \l{$x$ and $y$ are relatively prime} iff $\gcf(x,y) = 1$.
 	Assume for all $x,y,X,Y$, $x \in X$ and $y \in Y$ implies $(x,y) \in X \times Y$.
 	Assume for all $x,y,z$, $x < y$ and $y < z$ implies $x < z$.
 	Assume for all $x,y,z$, $x > y$ and $y > z$ implies $x > z$.
@@ -153,15 +174,25 @@
 	Assume for all $X,Y,Z$, if $X \subseteq Z$ then $X \subseteq Y \cup Z$.
 	Assume for any $a,b,c,d$, $a \geq b$ and $c \geq d$ implies $a+c \geq b+d$.
 	Assume for any $a,b,c,d$, if $a \geq b$ and $c \leq d$ then $a-c \geq b-d$.
+	Assume for any $f,a,b,c,d$, \l{$b$ is the image of $a$ under $f$}, \l{$d$ is the image of $c$ under $f$}, $f$ is injective, and $a \neq c$ implies that $b \neq d$.
 	Assume for any $f,g,X,Y,Z$, \l{$f$ is a total function from $X$ to $Y$} and \l{$g$ is a total function from $Y$ to $Z$} implies that \l{$g \circ f$ is a total function from $X$ to $Z$}.
 	Assume for any $f,x,X,Y$, \l{$f$ is a total function from $X$ to $Y$} and $x \in X$ implies $f(x) \in Y$.
+	Assume for any $f,x,X,Y$, \l{$f$ is a total function from $X$ to $Y$} and $x \in X$ implies \l{$f(x)$ is the image of $x$ under $f$}.
 	Assume for any $f,x,X,Y$, \l{$f$ is a total map from $X$ to $Y$} and $x \in X$ implies $f(x) \in Y$.
 	Assume for any $f,X,Y$, if \l{$f$ is a total function from $X$ to $Y$} then $f$ is a total function.
 	Assume for any $i,j,X,k,l,Y$, if \l{$k$ is one more than $j$}, \l{$X$ is the set of integers from $i$ to $j$}, and \l{$Y$ is the set of integers from $k$ to $l$} then \l{$X \cup Y$ is the set of integers from $i$ to $l$}.
 	Assume for any $i,j,X,k,l,Y$, if \l{$X$ is the set of integers from $i$ to $j$}, \l{$Y$ is the set of integers from $k$ to $l$}, $i \leq k$, and $j \geq l$ then $Y \subseteq X$.
 	Assume for any $m$, if $m$ is a map then $\dom(m)$ is a set and $\ran(m)$ is a set.
+	Assume for any $R,X$, $R \subseteq X \times X$ implies that \l{$R$ is a binary relation over $X$}.
+	Assume for any $R,X$, \l{$R$ is a non-strict total order over $X$} iff \l{$R$ is a binary relation over $X$}, \l{$R$ is an antisymmetric relation over $X$}, \l{$R$ is a transitive relation over $X$}, and \l{$R$ is a total relation over $X$}.
+	Assume for any $R,X$, \l{$R$ is a partial order over $X$} iff \l{$R$ is a binary relation over $X$}, \l{$R$ is a reflexive relation over $X$}, \l{$R$ is a transitive relation over $X$}, and \l{$R$ is an antisymmetric relation over $X$}.
+	Assume for any $R,X$, \l{$R$ is a strict total order over $X$} iff \l{$R$ is a binary relation over $X$}, \l{$R$ is a transitive relation over $X$} and \l{$R$ is a trichotomous relation over $X$}.
 	Assume for any $R,X,Y$, $R \subseteq X \times Y$ implies that \l{$R$ is a relation between $X$ and $Y$}.
+	Assume for any $R,X,Y$, \l{$R$ is a binary relation over $X$} and $Y \subseteq X$ implies that \l{$R$ is a binary relation over $Y$}.
+	Assume for any $S$, $S$ is a set implies $S^1 = S$.
 	Assume for any $S$, if $S$ is an infinite set then $\powerset(S)$ is an infinite set.
+	Assume for any $S$, if \l{$S$ is the set corresponding to the relational operator $\nofix{<}$} then $S \subset \R \times \R$, \l{$S$ is a strict total order over $\R$}.
+	Assume for any $S$, if \l{$S$ is the set corresponding to the relational operator $\nofix{\leq}$} then $S \subset \R \times \R$, \l{$S$ is a non-strict total order over $\R$}.
 	Assume for any $S,v,i,j$, if \l{$S$ is the set of components in $v$ ranging from $i$ to $j$} then $S$ is a finite set.
 	Assume for any $v$, $v$ is an infinite sequence iff $v$ is a vector with unbounded length.
 	Assume for any $v,i,j,X,S$, if \l{$S$ is the set of components in $v$ ranging from $i$ to $j$} and $v \in X^\ast$ then $S \subset X$.
@@ -169,6 +200,7 @@
 	Assume for any $x$, $x \in \emptyset$ implies that there is a contradiction.
 	Assume for any $x$, $x \in \R$ implies $|x| \geq 0$.
 	Assume for any $X$, $X$ is a finite set iff $|X| \in \N$.
+	Assume for any $x$, $x$ is even iff \l{$2$ is a factor of $x$}.
 	Assume for any $x$, if $x \in \R$ then $-x \in \R$.
 	Assume for any $x$, if $x \in \Z$ then \l{$x$ is one more than $x-1$}.
 	Assume for any $x$, if $x \in \Z$ then \l{$x+1$ is one more than $x$}.
@@ -176,11 +208,15 @@
 	Assume for any $X,i,j$, if \l{$X$ is the set of integers from $i$ to $j$} then $\max X = j$.
 	Assume for any $X,i,j$, if \l{$X$ is the set of integers from $i$ to $j$} then $\min X = i$.
 	Assume for any $x,X$, if \l{$x$ is the sum of $X$} and $X \subset \N$ then $x \in \N$.
-	Assume for any $x,X$, if \l{$x$ is the sum of $X$} and $X \subset \N$ then $x \in \N$.
 	Assume for any $x,X$, if \l{$x$ is the sum of $X$} and $X \subset \Z$ then $x \in \Z$.
+	Assume for any $x,y$, $x < y$ and $y < x$ implies there is a contradiction.
+	Assume for any $x,y$, $x > y$ and $y > x$ implies there is a contradiction.
 	Assume for any $X,Y$, $X \in \powerset(Y)$ iff $X \subseteq Y$.
-	Assume for any $x,y$, $x$ is even, $y$ is even, and \l{$x$ and $y$ are relatively prime} implies that there is a contradiction.
 	Assume for any $x,y$, if $x \in \{y\}$ then $x = y$.
 	Assume for any $X,Y$, if $X$ is a finite set and $Y$ is a finite set then $X \cup Y$ is a finite set.
+	Assume for any $x,y$, \l{$x$ and $y$ are relatively prime} iff \l{$y$ and $x$ are relatively prime}.
 	Assume for any $X,Y,i,j$, \l{$X$ is the set of integers from $i$ to $j$} and  \l{$Y$ is the set of integers from $i$ to $j$} implies $X = Y$.
+	Assume for any $x,y,z$, if \l{$x$ is a factor of $y$} and \l{$x$ is a factor of $z$} then $\gcf(y,z) \geq x$.
+	Assume for any $x,y,z$, if \l{$x$ is a factor of $y$} and \l{$x$ is a factor of $z$} then $\gcf(z,y) \geq x$.
+	Assume \l{$\{(x,y) | x \in \R, y \in \R, x < y\}$ is the set corresponding to the relational operator $\nofix{<}$}.
 \vend

@@ -133,6 +133,16 @@ cnv eix pix oix min0 vs (Exp (App (C Neg) e)) =
       (vs'', _, min3') = dof eix pix oix min0 min3 "Neg" "null" "false" vs3
   in (vs'', eix3+1, min3')
 
+cnv eix pix oix min0 vs (Exp (App (e1@(C GCF)) e2)) =
+    let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "{", Exp e1, Exp e2, Syn "}"]
+        (vs'', _, min3') = dof eix pix oix min0 min3 (show Apply) "null" "false" vs3
+    in (vs'', eix3+1, min3')
+  
+cnv eix pix oix min0 vs (Exp (App (e1@(C LCM)) e2)) =
+    let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "{", Exp e1, Exp e2, Syn "}"]
+        (vs'', _, min3') = dof eix pix oix min0 min3 (show Apply) "null" "false" vs3
+    in (vs'', eix3+1, min3')
+
 cnv eix pix oix min0 vs (Exp (App (C Ceil) e)) =
   let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "\\lceil", Exp e, Syn "\\rceil"]
       (vs'', _, min3') = dof eix pix oix min0 min3 "Ceil" "null" "false" vs3
@@ -192,6 +202,8 @@ ggg c f ow = case c of
   EulerE -> f "EulerE" "\\eulere"
   Max -> f "Max" "\\max"
   Min -> f "Min" "\\min"
+  LCM -> f "LCM" "\\lcm"
+  GCF -> f "GCF" "\\gcf"
   Set [] -> f "Emptyset" "\\emptyset"
   SetN -> f "SetN" "\\N"
   SetZ -> f "SetZ" "\\Z"
@@ -205,6 +217,13 @@ ggg c f ow = case c of
   Minus -> f "Minus" "\\nofix{-}"
   Times -> f "Times" "\\nofix{*}"
   Div -> f "Div" "\\nofix{/}"
+
+  Eql -> f "Eql" "\\nofix{=}"
+  Lt -> f "Lt" "\\nofix{<}"
+  Lte -> f "Lte" "\\nofix{\\leq}"
+  Gt -> f "Gt" "\\nofix{>}"
+  Gte -> f "Gte" "\\nofix{\\geq}"
+  Neq -> f "Neq" "\\nofix{\\neq}"
   _ -> ow
 
 expSql e = showSep "\n" $ ((\(x,y,z) -> x) $ cnvAll 0 (-1) 0 0 [] es)

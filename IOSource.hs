@@ -20,6 +20,7 @@ import Text.ParserCombinators.Parsec
 
 import IOPrintFormat
 import Exp
+import Context
 
 ----------------------------------------------------------------
 -- Helper functions for manipulating source text strings.
@@ -66,6 +67,7 @@ srcTxt s p1 p2 =
 data Err = ErrUnbound [String] | ErrVer String
 data Src =
     Src String
+  | SrcStat Stat Src
   | SrcOk Src
   | SrcErr Src Err
   | SrcL [String] [Src]
@@ -77,6 +79,7 @@ showWithErr oFmt err s = case err of
 
 showSrc oFmt src = case src of
   Src s -> fmt oFmt "string" s
+  SrcStat _ s -> showSrc oFmt s
   SrcOk s -> fmt oFmt "valid" $ showSrc oFmt s
   SrcErr s err -> showWithErr oFmt err $ showSrc oFmt s
   SrcL ts ss -> sht ts ss where
@@ -91,10 +94,19 @@ showSrc oFmt src = case src of
 isErr :: Src -> Bool
 isErr s = case s of
   Src _ -> False
+  SrcStat _ s -> isErr s
   SrcOk _ -> False
   SrcErr _ _ -> True
   SrcL _ srcs -> or $ map isErr srcs
   SrcIg srcs -> or $ map isErr srcs
+
+statSrc s = case s of
+  Src _ -> [[], []]
+  SrcStat s _ -> s
+  SrcOk s -> statSrc s
+  SrcErr s _ -> statSrc s
+  SrcL _ ss -> statSrc $ last ss
+  SrcIg ss -> statSrc $ last ss
 
 ----------------------------------------------------------------
 -- Abstract syntax for a full source document (consisting of a

@@ -18,8 +18,10 @@
 ----------------------------------------------------------------
 --
 
-module MapUsingRBTree (Map, emp, app, ran, preImg, set, 
-                         def, mapRan, appInDom, inDom) where
+module MapUsingRBTree (Map, emp, app, ran, preImg, set, domSize,
+                       ranSize, def, mapRan, appInDom, inDom) where
+
+import Set ((\/))
 
 ----------------------------------------------------------------
 -- Implementation.
@@ -33,6 +35,16 @@ data Tree a b = NULL | Bran Color (Tree a b) (a,b) (Tree a b)
 
 emp :: Tree a b
 emp =  NULL
+
+domSize :: Tree a b -> Integer
+domSize t = sz t where
+  sz (Bran _ t _ t') = 1 + sz t + sz t'
+  sz NULL = 0
+
+ranSize :: Eq b => Tree a b -> Integer
+ranSize t = toInteger $ length $ u t where
+  u (Bran _ t (_,y) t') = [y] \/ u t \/ u t'
+  u NULL = []
 
 inDom :: (Eq a, Ord a) => Tree a b -> a -> Bool
 inDom t x = isIndex x t

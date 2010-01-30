@@ -53,6 +53,9 @@ type Hypergraph a b = ([(Mark,Law a b)], Map a (Mark, [(Mark,[b])]))
 empHG :: (Eq a, Ord a, Eq b) => Hypergraph a b
 empHG = ([], emp)
 
+hgSize :: Ord a => Hypergraph a b -> Integer
+hgSize (ls,g) =  toInteger $ length $ concat (map snd $ ran g)
+
 addLawHG :: (Eq a, Ord a) => Hypergraph a b -> ([Edge a b], [Edge a b]) -> Hypergraph a b
 addLawHG (ls,g) (r,o) = ((marked,((map fst r, map snd r),o)):ls,g')
   where g' = foldr (\x g -> def x (unmarked,[]) (\_ y ->y) g) g (map fst r)

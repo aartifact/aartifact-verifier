@@ -37,14 +37,18 @@ data Const =
   | Mod | GCF | LCM
   | Max | Min | Floor | Ceil
   | Subscript | Circ
+  | VectorNorm
+  | Interval
   | Eql | Neq | Lt | Lte | Gt | Gte | Cong
   | In | Union | Isect | Cart | Arrow | Ran | Dom
   | Subset | Subseteq
   | And | Or | Not | Imp | Iff | IfThenElse
   | B Bool | N Rational | SetZ | SetN | SetQ | SetR | Ast
   | SetComp | SetExplicit | SetEnum | Set [Const] | PowerSet
-  | TC [Const] | Kleene [Const]
+
   | NLPredC [Maybe String] | NLPredLC [Maybe String]
+
+  | TC [Const] | Kleene [Const]
   | Brack Bracket Bracket
   | Infinity
   deriving (Show,Eq,Ord)
@@ -77,6 +81,7 @@ constStrPairs = map (\p->(p,None))
   , (Log, "\\log")
   , (GCF, "\\gcf")
   , (LCM, "\\lcm")
+  , (Interval, "\\interval")
   ]
 opsIter = map (\p->(p,None))
   [ (Plus,  "\\sum")

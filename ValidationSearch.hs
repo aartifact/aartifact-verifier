@@ -30,7 +30,7 @@ import ValidationComp
 -- Top-level verification based on basic inference rules that
 -- govern the two quantifiers and five logical operators.
 
-verify s e = r$r$r$r$r$vfy s e where
+verify s e = r$r$r$vfy s e where
   r (Potential vf) = vf ()
   r v = v
 
@@ -54,12 +54,18 @@ vfy s e =
   Exists ns e0 -> srch0 $ (srchv s e ||| vfyExists s e) --vfyQ s e0 orV' |||
   _ ->
    let s' = considerCxt e s
+       fff Unknown = if eqCxt s' e (C(B False)) then Verifiable (B False) else Unknown
+       fff ow = ow
    in    if eqCxt s' e (C(B True)) then Verifiable (B True)
-    else if eqCxt s' e (C(B False)) then Verifiable (B False)
-    else (chkC s' e) $
+    else 
+     fff $ (
+         (chkC s' e) $
          srchv s' e
      ||| boolToV (assertCxt s' e)
      ||| boolToV (or [eqCxt s' a e | a<-trueExpsCxt s'])
+     )
+
+
 
 ----------------------------------------------------------------
 -- Take a list of expressions sharing free variables, and tries to

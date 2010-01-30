@@ -29,8 +29,8 @@ import ValidationSearch (verify)
 -- Process a list of statements while maintaining a context,
 -- and validate expressions with respect to this context.
 
-validate :: [Stmt] -> [Stmt] -> [Stmt]
-validate ont ss = fst $ execs (state0 ont') ss
+validate :: [Stmt] -> [Stmt] -> ([Stmt], Stat)
+validate ont ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 ont') ss
   where ont' = concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
 
 exec :: Context -> Stmt -> ([Stmt], Context)
@@ -39,7 +39,8 @@ exec state (s@(SyntaxError _)) = ([s], state)
 exec state (s@(Intro _ Variable vs)) = ([s], updVars vs state)
 exec state (s@(Intro srcStr _ vs)) = ([s], updConsts vs state)
 exec state (ExpStmt Assert (e,src)) = ([ExpStmt Assert (e',src')], state'')
-  where state'' = if isErr src' then considerCxt e' state' else assumeCxt e' state'
+  where state'' = updStat stat' $ if isErr src' then considerCxt e' state' else assumeCxt e' state'
+        stat' = statSrc src'
         src' = vArt state' e' src
         (e',state') = freshExpVars (normOps e) state
 exec state (ExpStmt si (e,src)) = ([ExpStmt si (e',src')], state'')
@@ -88,8 +89,8 @@ vArt s e src =
   let fvs = fv (varsCxt s) e
   in if length fvs > 0 then SrcErr src (ErrUnbound (map fst fvs)) else
      case verify s e of
-       Verifiable (B True) -> SrcOk src --([R str $ Verifiable s (B True)], assumeCxt e state')
-       r                   -> SrcErr src (ErrVer "") --([R (str) r], state')
+       Verifiable (B True) -> SrcStat (statCxt s) $ SrcOk src --([R str $ Verifiable s (B True)], assumeCxt e state')
+       r                   -> SrcStat (statCxt s) $ SrcErr src (ErrVer "") --([R (str) r], state')
 
 -- ++":"++(show (evalExp state e)) -- ++ show (getR state)
 -- eof
