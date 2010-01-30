@@ -34,6 +34,9 @@ type Equivalence a b = (Map a b, b)
 empEquiv :: Num b => Equivalence a b
 empEquiv = (emp, 1)
 
+eqvSize :: Eq b => Equivalence a b -> (Integer, Integer)
+eqvSize (m,_) = (domSize m, ranSize m)
+
 -- This determines if two expressions are equal according
 -- to the data structure.
 chkEquality :: (Eq a, Ord a, Num b) => Equivalence a b -> a -> a -> Bool
