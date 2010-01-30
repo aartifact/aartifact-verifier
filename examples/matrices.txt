@@ -1,0 +1,22 @@
+\vbeg
+
+Assume for all $u,v \in \R^2, A \in \R^{2 \times 2}$, $A*(u + v) = A*u + A*v$.
+Assume for all $u,v \in \R^2, A \in \R^{2 \times 2}$, $A*(u - v) = A*u - A*v$.
+Assume for all $a \in \R, u \in \R^2, A \in \R^{2 \times 2}$, $A * (a * u) = a * (A * u)$.
+
+Assume for all $u,v \in \R^2$, $u+v \in \R^2$.
+Assume for all $u,v \in \R^2$, $u-v \in \R^2$.
+Assume for all $a \in \R, u \in \R^2$, $a*u \in \R^2$.
+
+Assert for all $a \in \R, u,v,w \in \R^2, A \in \R^{2 \times 2}$,
+  if $w = a*(u-v) + v$ then
+  $A*w = A*(a*(u-v) + v)$,
+  $A*((a*(u-v)) + v) = A*(a*(u-v)) + A*v$,
+  $A*(a*(u-v)) = a*(A*(u-v))$,
+  $A*(u-v) = A*u - A*v$,
+  $a*(A*(u-v)) = a*(A*u - A*v)$,
+  $A*(a*(u-v) + v) = a*(A*u - A*v)+A*v$,
+  $A*w = a*(A*u - A*v) + A*v$.
+
+
+\vend

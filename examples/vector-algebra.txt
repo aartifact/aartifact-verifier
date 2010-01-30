@@ -1,0 +1,85 @@
+\vbeg
+Assume for all $x,y,x',y' \in \R$, $(x,y) + (x',y') = (x+x',y+y')$.
+Assume for all $a,x,y \in \R$, $a * (x,y) = (a*x, a*y)$.
+\vend
+
+
+\vbeg
+
+Assert for any $x,y \in \R$, $x \in \R$, $2+x = x+2$.
+
+Assume for any $x,y,x',y' \in \R$, $(x,y) + (x',y') = (x+x', y+y')$.
+Assume for any $s,x,y \in \R$, $s * (x,y) = (s * x, s * y)$.
+
+Assert for any $x,y,x',y' \in \R$,
+  $(x,y) + (x',y') = (x+x',y+y')$,
+  $x+x' = x'+x$,
+  $y+y' = y'+y$,
+  $(x+x',y+y') = (x'+x,y'+y)$,
+  $(x'+x,y'+y) = (x',y') + (x,y)$,
+  $(x',y') + (x,y) = (x,y) + (x',y')$.
+
+Assert for any $x,y,x',y',x'',y'' \in \R$,
+  $(x,y) + (x',y') = (x+x',y+y')$,
+  $(x+x',y+y') +  (x'',y'') = ((x+x')+x'',(y+y')+y'')$,
+  $((x,y) + (x',y')) +  (x'',y'') = (x+x'+x'',y+y'+y'')$,
+  $(x+x')+x'' = x+(x'+x'')$,
+  $(y+y')+y'' = y+(y'+y'')$,
+  $((x+x')+x'',(y+y')+y'') = (x+(x'+x''),y+(y'+y''))$,
+  $(x+(x'+x''),y+(y'+y'')) = (x,y) + (x'+x'', y'+y'')$,
+  $(x'+x'', y'+y'') = (x',y') + (x'',y'')$,
+  $((x,y) + (x',y')) + (x'',y'') = (x,y) + ((x',y') + (x'',y''))$.
+
+Assert for all $x,y \in \R$,
+   $(0,0) + (x,y) = (0+x,0+y)$,
+   $0+x = x$, $0 + y = y$,
+   $(0+x,0+y)= (x,y)$.
+
+Assert for all $x,y \in \R$,
+   $(x,y) + (0,0) = (x+0,y+0)$,
+   $x+0 = x$, $y+0 = y$,
+   $(x+0,y+0)= (x,y)$.
+
+Assert for all $a,x,y,x',y' \in \R$,
+$(x,y) + (x',y') = (x+x',y+y')$,
+$a * ((x,y) + (x',y')) = a*(x+x',y+y')$,
+$a*(x+x',y+y') = (a*(x+x'),a*(y+y'))$,
+$(a*(x+x'),a*(y+y')) = (((a*x)+(a*x')),(a*y)+(a*y'))$,
+$(((a*x)+(a*x')),(a*y)+(a*y')) = (a*x,a*y) + (a*x',a*y')$,
+$(a*x,a*y) = a*(x,y)$,  $(a*x',a*y') = a*(x',y')$,
+$a * ((x,y) + (x',y')) = (a * (x,y)) + (a * (x',y'))$.
+
+Assert for all $a,a',x,y \in \R$,
+
+$a' * (x,y) = (a'*x, a'*y)$,
+$a * (a'*x, a'*y) = (a*(a'*x), a*(a'*y))$,
+$(a*(a'*x), a*(a'*y)) = ((a*a')*x, (a*a')*y)$,
+$((a*a')*x, (a*a')*y) = (a*a')*(x,y)$,
+$a * (a' * (x,y)) = (a * a') * (x,y)$.
+
+Assert for all $x,y \in \R$,
+$1 * (x,y) = (1*x,1*y)$, $1*x = x$, $1*y = y$, $(1*x,1*y) = (x,y)$, $1 * (x,y) = (x,y)$.
+
+
+Assert for all $x,y \in \R$,
+$-1 * (x,y) = (-1*x, -1*y)$,
+$((-1)*x) \in \R$, $((-1)*y) \in \R$,
+$((-1*x), (-1*y)) + (x,y) = ((-1*x)+x,(-1*y)+y)$,
+$-1*x+x = 0$,
+$-1*y+y = 0$,
+$(-1 * (x,y)) + (x,y) = (0,0)$.
+
+\vend
+
+
+\vbeg
+
+Assert for all $a,b,x,y \in \R$,
+  $(a + b) * (x,y) = ((a+b)*x, (a+b)*y)$,
+  $((a+b)*x, (a+b)*y) = (a*x + b*x, a*y + b*y)$,
+  $(a*x + b*x, a*y + b*y) = (a*x, a*y) + (b*x, b*y)$,
+  $(a*x, a*y) = a*(x,y)$,
+  $(b*x, b*y) = b*(x,y)$,
+  $(a*x, a*y) + (b*x, b*y) = a*(x,y) + b*(x,y)$,
+  $(a + b) * (x,y) = a*(x,y) + b*(x,y)$.
+\vend

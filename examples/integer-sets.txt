@@ -1,0 +1,11 @@
+\vbeg
+Assert for any $x,y \in \N$, if $x < y$ then \l{$\{x,\ldots,y\}$ is the set of integers from $x$ to $y$} and $\max \{x,\ldots,y\} = y$.
+
+Assert for any $x,y \in \N$, if $x > y$ then $\{x,\ldots,y\} = \emptyset$.
+
+Assert for any $x,y,z$, if \l{$x$ is the set of integers from $y$ to $z$} then $\max(x) = z$.
+
+Assert for any $x,y,z \in \N$, if $y \geq x$ and $z \geq y+1$ then
+:$\{x,...,y\} \cup \{y+1,...,z\} = \{x,...,z\}$.
+
+\vend
