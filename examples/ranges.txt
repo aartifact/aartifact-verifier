@@ -1,0 +1,20 @@
+\vbeg
+  Introduce $T,T'$. 
+
+  Assume 
+  $T \in \N$, 
+  $T' \in \N$, 
+  $T \geq 1$, 
+  $T' \geq T$. 
+
+  Assert 
+  for all $n \in \N, a \in \{0,1\}^\ast$, 
+   $\{n,\ldots,n+(T-1)\} \subseteq \{n,\ldots,n+(T'-1)\}$, 
+   for any $S,S',V,V'$, 
+    $S = \{n,\ldots,n+(T-1)\}$, 
+    $S' = \{n,\ldots,n+(T'-1)\}$, 
+    $V = \{a_i | i \in S\}$, 
+    $V' = \{a_i | i \in S'\}$
+  implies that 
+    $\sum_{x \in V} x \leq \sum_{x \in V'} x$.
+\vend
