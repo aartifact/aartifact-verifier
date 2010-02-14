@@ -1,0 +1,31 @@
+We want to show that $\sqrt{2}$ is irrational. We will proceed by contradiction.
+
+== Argument ==
+
+\vbeg
+Assert for any $n, m \in \Z$,
+if $m \neq 0$,
+:\l{$n$ and $m$ are relatively prime}, and
+:$\sqrt{2} = n/m$ then
+::$m \cdot \sqrt{2} = m \cdot (n/m)$,
+::$m \cdot \sqrt{2} = n$,
+::$(m \cdot \sqrt{2})^2 = n^2$,
+::$m^2 \cdot \sqrt{2}^2 = n^2$,
+::$m^2 \cdot 2 = n^2$,
+::$n^2 = m^2 \cdot 2$,
+::$n^2 = 2 \cdot m^2$,
+::\l{$n^2$ is even},
+:\l{$n$ is even}, and
+
+::$n^2 = (2 \cdot (n/2))^2$,
+::$n^2 = 2^2 \cdot ((n/2)^2)$,
+::$n^2 = 4 \cdot ((n/2)^2)$,
+::$2 \cdot m^2 = 4 \cdot (n/2)^2$,
+::$m^2 = 2 \cdot (n/2)^2$,
+::\l{$m^2$ is even},
+:\l{$m$ is even},
+
+:$\gcf(m,n) \geq 2$,
+:$\gcf(m,n) = 1$,
+:\l{there is a contradiction}.
+\vend
