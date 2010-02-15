@@ -1,0 +1,51 @@
+Propositional logic is supported by the verifier for English phrase predicates that take no arguments. In other words, atoms for propositional logic are defined as English phrase predicates that contain no subexpressions.
+
+== Axioms ==
+
+We demonstrate that all of the axioms of propositional logic (a list of which can be found in any textbook on logic [1]) are verified by the system.
+
+\vbeg
+Assert \p{A} implies \p{A}.
+
+Assert \p{A} implies (\p{B} implies \p{A}).
+
+Assert (\p{A} implies \p{B}) implies ((\p{A} implies (\p{B} implies \p{C})) implies (\p{A} implies \p{C})).
+
+Assert \p{A} implies (\p{B} implies (\p{A} and \p{B})).
+
+Assert (\p{A} and \p{B}) implies \p{A}.
+
+Assert (\p{A} and \p{B}) implies \p{B}.
+
+Assert \p{A} implies (\p{A} or \p{B}).
+
+Assert \p{B} implies (\p{A} or \p{B}).
+
+Assert (\p{A} implies \p{C}) implies ((\p{B} implies \p{C}) implies ((\p{A} or \p{B}) implies \p{C})).
+
+Assert (not not \p{A}) implies \p{A}.
+
+Assert (\p{A} implies \p{B}) implies ((\p{A} implies not \p{B}) implies not \p{A}).
+
+\vend
+
+The following corresponds to modus ponens.
+
+\vbeg
+Assert ((\p{A} implies \p{B}) and \p{A}) implies \p{B}.
+\vend
+
+
+== Examples ==
+
+The search algorithm allows for verification of a variety of more complex propositions.
+
+\vbeg
+Assert (\p{A} and \p{B} and \p{C} and \p{D}) implies \p{B}.
+
+Assert (\p{A} implies \p{C}) and (\p{B} implies \p{C}) and (\p{D} implies \p{C}) implies ((\p{A} or \p{B} or \p{D}) implies \p{C}).
+\vend
+
+== References ==
+
+[1] Kleene, S. C. <i>Mathematical Logic.</i> New York: Dover, 2002.

@@ -1,0 +1,18 @@
+Propositional logic is supported by the verifier for English phrase predicates that take no arguments. In other words, atoms for propositional logic are defined as English phrase predicates that contain no subexpressions.
+
+== Axioms ==
+
+We demonstrate that all of the axioms of propositional logic (a list of which can be found in any textbook on logic [1]) are verified by the system.
+
+
+\vbeg
+Introduce $P$.
+Assume $P(0)$.
+Assert $P(0) = (1=1)$.
+Assume for any $n$, {$n \in \N$ and $P(n)$} implies $P(n+1)$.
+Assume $(\forall n. (n \in \N \wedge P(n)) \Rightarrow P(n+1))$.
+
+Assert $(\forall n. (n \in \N \wedge P(n)) \Rightarrow P(n+1)) = (1=1)$.
+
+Assert (\p{A} implies \p{C}) and (\p{B} implies \p{C}) and (\p{D} implies \p{C}) implies ((\p{A} or \p{B} or \p{D}) implies \p{C}).
+\vend
