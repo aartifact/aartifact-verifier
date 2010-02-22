@@ -1,0 +1,80 @@
+
+
+
+Introduce set operators $\Rrightarrow$.
+
+Assert $1 \Rrightarrow 2 = 1 \Rrightarrow 2$.
+
+Introduce $S$.
+Assert $(\sum_{i \in 4} i) = (\sum_{x \in 4} x)$.
+
+Assume $S \subset \N$.
+Assume {for all $x \in S$, $x \leq 4$}.
+
+Assert \l{the elements of $S$ are bounded above by $4$}.
+
+Introduce $S$.
+Assume $S$ is a finite set and $S \subset \R$.
+Assume $S$ is the empty set.
+Assert \l{${\sum_{x \in S} x}$ is the sum of $S$}
+Assert ${\sum_{x \in S} 1}$ is zero
+Assert ${\sum_{x \in S} 1} = 0$
+
+Introduce $X,y$.
+Assume {for all $x \in X$, $y \neq x$}.
+Assert $y \not\in X$.
+
+Assert $0 \subsetneq 0$.
+
+Introduce $P$.
+Assume for all $n \in \N$, $P(n)$ implies $P(n+1)$.
+Assume $P(0)$.
+
+Assert $4 \in \N$.
+Assert $P$ is true for all natural numbers.
+Assert for any $n \in \N$, $P(n)$.
+Assert $P(4)$.
+
+
+
+:Introduce $S$.
+:Assume $0 \in S$.
+:Assume for all $n \in \N$, $n \in S$ implies $n+1 \in S$.
+
+Assert $\N = S$.
+:Assert for all $n \in \N$, $n \in S$.
+
+Introduce $x,y$.
+Assume $x$ is a test.
+Assert $x$ is also a test.
+Assert $x = \N$.
+
+Introduce $X$.
+Assume $X$ is a set and $X$ is non-empty.
+%-- Assert there exists $x \in X$ s.t. $x \in x$.
+
+
+Introduce $Y,n$.
+Assume $Y = n$.
+Assume \l{$Y$ is test}.
+Assert \l{$n$ is test}.
+
+Introduce $X,m$.
+Assume $(\sum_{x \in X} x) = m$.
+Assume \l{$m$ is test}.
+Assert \l{$\sum_{x \in X} x$ is test}.
+
+%-- Assume {there exists $x$ s.t. $x \in X$}.
+
+%-- Assert {there exists $x$ s.t. $x \in X$}.
+
+
+\vbeg
+Introduce $Y$.
+
+Assume \l{$Y$ is a test}.
+Assume \l{$Y$ is a non-empty set} and \l{$Y$ is a set}.
+Assert there exists $x$ s.t. $x \in Y$.
+
+
+\vend
