@@ -51,7 +51,11 @@ vfy s e =
   App (C SearchIff) (T[e',e]) -> if isVTrue $ vfy s e then vfy s e' else Unknown
 
   Forall ns e0 -> srch0 $ vfy (updVars ns s) e0         --vfyQ s e0 andV |||
-  Exists ns e0 -> srch0 $ (srchv s e ||| vfyExists s e) --vfyQ s e0 orV' |||
+  Exists ns e0 -> 
+    if (resetVar e) `elem` trueExpsCxt s then Verifiable (B True) else srch0 $ (srchv s e ||| vfyExists s e) --vfyQ s e0 orV' |||
+  
+  -- ??
+  
   _ ->
    let s' = considerCxt e s
        fff Unknown = if eqCxt s' e (C(B False)) then Verifiable (B False) else Unknown
