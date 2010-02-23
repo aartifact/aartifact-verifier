@@ -30,6 +30,9 @@ import Exp
 type Ix = Integer
 data Node = Syn String | SynData String String | Exp Exp | ExpMath Exp
 
+expSql e = showSep "\n" $ ((\(x,y,z) -> x) $ cnvAll 0 (-1) 0 0 [] es)
+  where es = if isLogical e then [Exp e] else [Syn "$", Exp e, Syn "$"]
+
 commaSepNode [e] = [e]
 commaSepNode (e:es) = e:(Syn ","):(commaSepNode es)
 
@@ -59,10 +62,22 @@ cnv eix pix oix min0 vs (Exp (Bind Considering _ (T[e1,e2]))) =
       (vs'', _, min3') = dof eix pix oix min0 min3 "Considering" "null" "false" vs3
   in (vs'', eix3+1, min3')
 
+cnv eix pix oix min0 vs (Exp (Bind InContextForall _ e)) =
+  let l = [ExpMath e]
+      (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs l
+      (vs'', _, min3') = dof eix pix oix min0 min3 "InContextForall" "null" "false" vs3
+  in (vs'', eix3+1, min3')
+
 cnv eix pix oix min0 vs (Exp (Bind Plus _ (T[e1,e2]))) =
   let l = [Syn "{", Syn "\\sum_{", Exp e1, Syn "\\rbrace", Syn "{", Exp e2, Syn "}", Syn "}"]
       (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs l
       (vs'', _, min3') = dof eix pix oix min0 min3 "Summation" "null" "false" vs3
+  in (vs'', eix3+1, min3')
+
+cnv eix pix oix min0 vs (Exp (Bind Times _ (T[e1,e2]))) =
+  let l = [Syn "{", Syn "\\prod_{", Exp e1, Syn "\\rbrace", Syn "{", Exp e2, Syn "}", Syn "}"]
+      (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs l
+      (vs'', _, min3') = dof eix pix oix min0 min3 "Product" "null" "false" vs3
   in (vs'', eix3+1, min3')
 
 cnv eix pix oix min0 vs (Exp (Bind SetComp _ (T [e1,e2]))) =
@@ -128,10 +143,53 @@ cnv eix pix oix min0 vs (Exp (App (C (Brack Bar Bar)) e)) =
       (vs'', _, min3') = dof eix pix oix min0 min3 "Brack Bar Bar" "null" "false" vs3
   in (vs'', eix3+1, min3')
 
+------
+{- cnv eix pix oix min0 vs (Exp (App (C (Brack b1 b2)) e)) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn (fst $ showBr b1), Exp e, Syn (snd $ showBr b2)]
+      (vs'', _, min3') = dof eix pix oix min0 min3 ("Brack"++" "++showBr b1++" "++show b2) "null" "false" vs3
+  in (vs'', eix3+1, min3') -}
+------
+
+cnv eix pix oix min0 vs (Exp (App (C IntervalOO) (T[e1,e2]))) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "(", Exp e1, Syn ", ", Exp e2, Syn ")"]
+      (vs'', _, min3') = dof eix pix oix min0 min3 "IntervalOO" "\\interval" "false" vs3
+  in (vs'', eix3+1, min3')
+
+cnv eix pix oix min0 vs (Exp (App (C IntervalOC) (T[e1,e2]))) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "(", Exp e1, Syn ", ", Exp e2, Syn "]"]
+      (vs'', _, min3') = dof eix pix oix min0 min3 "IntervalOC" "\\interval" "false" vs3
+  in (vs'', eix3+1, min3')
+  
+cnv eix pix oix min0 vs (Exp (App (C IntervalCO) (T[e1,e2]))) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "[", Exp e1, Syn ", ", Exp e2, Syn ")"]
+      (vs'', _, min3') = dof eix pix oix min0 min3 "IntervalCO" "\\interval" "false" vs3
+  in (vs'', eix3+1, min3')
+  
+cnv eix pix oix min0 vs (Exp (App (C IntervalCC) (T[e1,e2]))) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "[", Exp e1, Syn ", ", Exp e2, Syn "]"]
+      (vs'', _, min3') = dof eix pix oix min0 min3 "IntervalCC" "\\interval" "false" vs3
+  in (vs'', eix3+1, min3')
+
 cnv eix pix oix min0 vs (Exp (App (C Neg) e)) =
   let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "-", Exp e]
       (vs'', _, min3') = dof eix pix oix min0 min3 "Neg" "null" "false" vs3
   in (vs'', eix3+1, min3')
+
+cnv eix pix oix min0 vs (Exp (App (C (IterVect op)) (T[e1,e1',e2,e2']))) =
+  let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs $ 
+            [Exp e1, Syn "_", Exp e1', Syn (showC' op), Syn "...", Syn (showC' op), Exp e2, Syn "_", Exp e2']
+      (vs'', _, min3') = dof eix pix oix min0 min3 ("IterVect"++show op) "null" "false" vs3
+  in (vs'', eix3+1, min3')
+
+cnv eix pix oix min0 vs (Exp (App (e1@(C (Aggregate _))) e2)) =
+    let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "{", Exp e1, Exp e2, Syn "}"]
+        (vs'', _, min3') = dof eix pix oix min0 min3 (show Apply) "null" "false" vs3
+    in (vs'', eix3+1, min3')
+
+cnv eix pix oix min0 vs (Exp (App (e1@(C PowerSet)) e2)) =
+    let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "{", Exp e1, Syn "(", Exp e2, Syn ")", Syn "}"]
+        (vs'', _, min3') = dof eix pix oix min0 min3 (show Apply) "null" "false" vs3
+    in (vs'', eix3+1, min3')
 
 cnv eix pix oix min0 vs (Exp (App (e1@(C GCF)) e2)) =
     let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "{", Exp e1, Exp e2, Syn "}"]
@@ -157,13 +215,14 @@ cnv eix pix oix min0 vs (Exp (App (C c) (T es))) =
   case es of
     [e1,e2] ->
       if c `elem` [And, Or, Imp, Iff] then
-        let e1l = if isLogical e1 then [Exp e1] else [Syn "$", Exp e1, Syn "$"]
-            e2l = if isLogical e2 then [Exp e2] else [Syn "$", Exp e2, Syn "$"]
+        let e1l = if isLogical e1 then mkExpBraced e1 [Exp e1] else [Syn "$", Exp e1, Syn "$"]
+            e2l = if isLogical e2 then mkExpBraced e2 [Exp e2] else [Syn "$", Exp e2, Syn "$"]
             (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs $ [Syn "{"]++e1l++[Syn $ showC' c]++e2l++[Syn "}"]
             (vs'', _, min3') = dof eix pix oix min0 min3 (show c) "null" "false" vs3
         in (vs'', eix3+1, min3')
-      else if c `elem` [Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,Eql,Neq,Lt,Lte,Gt,Gte,Subset,Subseteq,In,Pow,Circ] then
-        let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs [Syn "{", Exp e1, Syn $ (showC' c), Exp e2, Syn "}"]
+      else if c `elem` bins then
+        let (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs $
+                      [Syn "{"] ++ mkBr c e1 [Exp e1] ++ [Syn $ (showC' c)]++ mkBr c e2 [Exp e2] ++ [Syn "}"]
             (vs'', _, min3') = dof eix pix oix min0 min3 (show c) "null" "false" vs3
         in (vs'', eix3+1, min3')
       else
@@ -183,7 +242,15 @@ cnv eix pix oix min0 vs (Exp (Forall (v:vars) (App (C Imp) (T[_,e])))) =
       (vs'', _, min3') = dof eix pix oix min0 min3 "Forall" "null" "false" vs3
   in (vs'', eix3+1, min3')
 
-cnv eix pix oix min0 vs (Exp (Exists (v:vars) (App (C Imp) (T[_,e])))) =
+cnv eix pix oix min0 vs (Exp (Exists (v:vars) (App (C And) (T[_,e])))) =
+  let q (v:vars) = [Syn ", ", Exp (Var v)] ++ q vars
+      q [] = []
+      l = [Syn "$", Exp (Var v)] ++ q vars ++ [Syn "$"] ++ [Syn " s.t. "] ++ [ExpMath e]
+      (vs3, eix3, min3) = cnvAll (eix+1) eix 0 (min0+1) vs l
+      (vs'', _, min3') = dof eix pix oix min0 min3 "Exists" "null" "false" vs3
+  in (vs'', eix3+1, min3')
+
+cnv eix pix oix min0 vs (Exp (Exists (v:vars) e)) =
   let q (v:vars) = [Syn ", ", Exp (Var v)] ++ q vars
       q [] = []
       l = [Syn "$", Exp (Var v)] ++ q vars ++ [Syn "$"] ++ [Syn " s.t. "] ++ [ExpMath e]
@@ -211,12 +278,19 @@ ggg c f ow = case c of
   SetR -> f "SetR" "\\R"
   PowerSet -> f "PowerSet" "\\powerset"
   Ast -> f "Ast" "\\ast"
+  Infinity -> f "Infinity" "\\infty"
   Dom -> f "Dom" "\\dom"
   Ran -> f "Ran" "\\ran"
   Plus -> f "Plus" "\\nofix{+}"
   Minus -> f "Minus" "\\nofix{-}"
   Times -> f "Times" "\\nofix{*}"
   Div -> f "Div" "\\nofix{/}"
+  
+  Aggregate Plus -> f "AggregatePlus" "\\sum"
+  Aggregate Times -> f "AggregateTimes" "\\prod"
+  Aggregate Circ -> f "AggregateCirc" "\\bigcirc"
+  Aggregate Union -> f "AggregateUnion" "\\bigcup"
+  Aggregate Isect -> f "AggregateIsect" "\\bigcap"
 
   Eql -> f "Eql" "\\nofix{=}"
   Lt -> f "Lt" "\\nofix{<}"
@@ -226,16 +300,29 @@ ggg c f ow = case c of
   Neq -> f "Neq" "\\nofix{\\neq}"
   _ -> ow
 
-expSql e = showSep "\n" $ ((\(x,y,z) -> x) $ cnvAll 0 (-1) 0 0 [] es)
-  where es = if isLogical e then [Exp e] else [Syn "$", Exp e, Syn "$"]
-
 isLogical (App (C (NLPredLC _)) _) = True
 isLogical (C (NLPredLC _)) = True
 isLogical (App (C c) (T [e1,e2])) = c `elem` [And, Or, Imp, Iff]
 isLogical (Forall _ _) = True
 isLogical (Exists _ _) = True
 isLogical (Bind Considering _ _) = True
+isLogical (Bind InContextForall _ _) = True
 isLogical _ = False
+
+bins = [Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,
+        Eql,Neq,Lt,Lte,Gt,Gte,Subset,Subseteq,In,Pow,Circ,
+        NotC Lt, NotC Lte, NotC Gt, NotC Gte, NotC In, NotC Subset, NotC Subseteq]
+
+binsOps = [Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,Pow,Circ]
+
+mkExpBraced (Forall _ _) l = [Syn "\\lbrace"]++l++[Syn "\\rbrace"]
+mkExpBraced (Exists _ _) l = [Syn "\\lbrace"]++l++[Syn "\\rbrace"]
+mkExpBraced (App (C c) (T [e1,e2]))  l = if c `elem` [Imp, Iff] then [Syn "\\lbrace"]++l++[Syn "\\rbrace"] else l
+mkExpBraced _ l = l
+
+mkBr c0 (App (C c) (T[e1,e2])) l =
+  if c `elem` binsOps && c0 `elem` binsOps then [Syn "("]++l++[Syn ")"] else l
+mkBr _ _ l = l
 
 showC' c = case c of
   And -> "and"
@@ -263,6 +350,9 @@ showC' c = case c of
   In -> "\\in"
   Subset -> "\\subset"
   Subseteq -> "\\subseteq"
+  Subsetneq -> "\\subsetneq"
+
+  NotC c -> "\\not" ++ showC' c
   _ -> ""
 
 showSep :: String -> [String] -> String
