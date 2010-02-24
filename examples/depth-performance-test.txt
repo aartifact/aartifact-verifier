@@ -1,0 +1,57 @@
+
+
+
+
+Introduce $a$.
+
+Assume $a_1 < a_2$.
+Assume $a_2 < a_3$.
+Assume $a_3 < a_4$.
+Assume $a_4 < a_5$.
+Assume $a_5 < a_6$.
+Assume $a_6 < a_7$.
+Assume $a_7 < a_8$.
+Assume $a_8 < a_9$.
+Assume $a_9 < a_{10}$.
+Assume $a_{10} < a_{11}$.
+Assume $a_{11} < a_{12}$.
+Assume $a_{12} < a_{13}$.
+Assume $a_{13} < a_{14}$.
+Assume $a_{14} < a_{15}$.
+Assume $a_{15} < a_{16}$.
+Assume $a_{16} < a_{17}$.
+Assume $a_{17} < a_{18}$.
+Assume $a_{18} < a_{19}$.
+Assume $a_{19} < a_{20}$.
+Assume $a_{20} < a_{21}$.
+Assume $a_{21} < a_{22}$.
+Assume $a_{22} < a_{23}$.
+Assume $a_{23} < a_{24}$.
+Assume $a_{24} < a_{25}$.
+Assume $a_{25} < a_{26}$.
+Assume $a_{26} < a_{27}$.
+Assume $a_{27} < a_{28}$.
+Assume $a_{28} < a_{29}$.
+Assume $a_{29} < a_{30}$.
+Assume $a_{30} < a_{31}$.
+Assume $a_{31} < a_{32}$.
+Assume $a_{32} < a_{33}$.
+Assume $a_{33} < a_{34}$.
+Assume $a_{34} < a_{35}$.
+Assume $a_{35} < a_{36}$.
+Assume $a_{36} < a_{37}$.
+Assume $a_{37} < a_{38}$.
+Assume $a_{38} < a_{39}$.
+Assume $a_{39} < a_{40}$.
+Assume $a_{40} < a_{41}$.
+
+\vbeg
+
+Introduce $x$.
+Assume $x \in \N$
+Assume $20*x = x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x$.
+Assert $1=1$.
+
+
+
+\vend
