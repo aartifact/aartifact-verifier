@@ -13,7 +13,7 @@
 ----------------------------------------------------------------
 -- 
 
-module ExpSubst (Subst, emptySubst, match, subst, unify,
+module ExpSubst (Subst, emptySubst, match, exmch, subst, unify,
                    boundInSubst, limitSubst, resetVar) where
 
 import Set
@@ -99,6 +99,9 @@ unifyMaybe _         _         = Nothing
 consistent :: Subst -> (Name, Exp) -> Bool
 consistent s (n,e) = and [e==e' | (n',e')<-s, n'==n]
 
+----------------------------------------------------------------
+-- Basic matching algorithm.
+
 match :: [Name] -> Exp -> Exp -> Maybe Subst
 match ns e1 e2 = match' [] ns e1 e2
 match' ps ns (C op)        (C op')          = if op == op' then Just emptySubst else Nothing
@@ -125,6 +128,52 @@ matchq' ps ns xs e xs' e' =
 matchs' ps ns es es' =
   if length es == length es' then
     foldl unifyMaybe (Just []) (map (uncurry $ match' ps ns) (zip es es'))
+  else
+    Nothing
+
+----------------------------------------------------------------
+-- Extended matching algorithm (matches last entries of a
+-- conjunction, variations on quantifiers.
+
+exmch :: [Name] -> Exp -> Exp -> Maybe Subst
+exmch ns e1 e2 = exmch' [] ns e1 e2
+exmch' ps ns (C op)        (C op')          = if op == op' then Just emptySubst else Nothing
+
+exmch' ps ns (Forall xs (App (C Imp) (T[C (B True), e]))) (Forall xs' (App (C Imp) (T[C (B True), e'])))  = exmchq' ps ns xs e xs' e'
+exmch' ps ns (Forall xs (e00@(App (C Imp) (T[e0, e])))) (Forall xs' (App (C Imp) (T[C (B True), e'])))  = exmch' ps ns (Forall xs e00) (Forall xs' e')
+exmch' ps ns (Forall xs (App (C Imp) (T[C (B True), e]))) (Forall xs' (e00'@(App (C Imp) (T[e0', e']))))  = exmch' ps ns (Forall xs e) (Forall xs' e00')
+
+exmch' ps ns (Forall xs e) (Forall xs' e')  = exmchq' ps ns xs e xs' e'
+
+exmch' ps ns (Exists xs (App (C And) (T[C (B True), e]))) (Exists xs' (App (C And) (T[C (B True), e'])))  = exmchq' ps ns xs e xs' e'
+exmch' ps ns (Exists xs (e00@(App (C And) (T[e0, e])))) (Exists xs' (App (C And) (T[C (B True), e'])))  = exmch' ps ns (Exists xs e00) (Exists xs' e')
+exmch' ps ns (Exists xs (App (C And) (T[C (B True), e]))) (Exists xs' (e00'@(App (C And) (T[e0', e']))))  = exmch' ps ns (Exists xs e) (Exists xs' e00')
+
+exmch' ps ns (Exists xs e) (Exists xs' e')  = exmchq' ps ns xs e xs' e'
+exmch' ps ns (Bind c xs e) (Bind c' xs' e') = if c==c' then exmchq' ps ns xs e xs' e' else Nothing
+
+--exmch' ps ns (App AppVar _) _  = Nothing
+--exmch' ps ns _ (App AppVar _)  = Nothing
+exmch' ps ns (App e1 e2)   (App e1' e2')    = exmchs' ps ns [e1,e2] [e1',e2']
+exmch' ps ns (T es)        (T es')          = exmchs' ps ns es es'
+exmch' ps ns (T es)        (C (TC cs))      = exmchs' ps ns es (map C cs)
+exmch' ps ns (Var x)       (Var x')         = if (x==x' && not (x `elem` ns)) || ((x,x') `elem` ps) then Just emptySubst
+                                              else if (x `elem` ns) then Just [(x, Var x')] else Nothing
+exmch' ps ns (Var x)       e2               = if Var x == e2 && not (x `elem` ns) then Just emptySubst
+                                              else if (x `elem` ns) then Just [(x, e2)] else Nothing
+exmch' ps ns _             _                = Nothing
+
+exmchq' ps ns xs e xs' e' =
+  let ps' = [(x,x') | (x,x')<-ps, not (x `elem` xs || x' `elem` xs')]
+  in if xs `eql` xs' then
+       exmch' ps' (ns `diff` xs) e e'
+     else if length xs == length xs' then
+       exmch' (ps'++(zip xs xs')) ((ns `diff` xs) `diff` xs') e e'
+     else Nothing
+
+exmchs' ps ns es es' =
+  if length es == length es' then
+    foldl unifyMaybe (Just []) (map (uncurry $ exmch' ps ns) (zip es es'))
   else
     Nothing
 
