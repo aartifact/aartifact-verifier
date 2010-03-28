@@ -16,8 +16,8 @@
 ----------------------------------------------------------------
 -- 
 
-module ContextRelations (considRels, addRelLaw, updRels, 
-                         updRelsTrue, updRelsEq, chkRels, eqChkZ, 
+module ContextRelations (considRels, addRelLaw, updRels, updRels'',
+                         updRelsTrue, updRelsEq, chkRels, chkRels', eqChkZ, 
                          closureRels, ixsEqv) where
 
 import MatchingIndex
@@ -35,8 +35,10 @@ import ContextHypergraph
 ixsEqv es eqs = getIxsWithPut (map resetVar es) eqs
 ixsEqv' es eqs = getIxsWithPut es eqs
 
-updRels rs (App (C Eql) (T[e1,e2])) = updRelsEq rs e1 e2
+updRels'' rs (e@(App (C _) _)) = updRels rs e
+updRels'' rs e = updRelsTrue rs (resetVar e)
 
+updRels rs (App (C Eql) (T[e1,e2])) = updRelsEq rs e1 e2
 updRels rs e = upd ixsEqv' (upd ixsEqv rs e) e
 upd ixsEqv (aux,eqs,hg) (App (C c) (T es)) = [(c,is)] |=>* (aux,eqs',hg)
   where (is,eqs') = ixsEqv es eqs
@@ -47,15 +49,23 @@ updRelsTrue rs e = rs''
         rs' = updRels rs (bOp Eql e (C(B True)))
 
 updRelsEq (aux,eqs,hg) e0 e = [(Eql,[i,i'])] |=>* (aux,mergeEC i i' eqs',relabelHG hg i i')
-  where ([i,i'],eqs') = ixsEqv' [e0,e] eqs
+  where ([i,i'],eqs') = ixsEqv' [e0',e'] eqs
+        (e0',e') = (resetVar e0, resetVar e)
 
 -- This checks the structure for a particular relation instance.
 -- This currently takes linear time, this should be much faster.
 chkRels _ (C (B True)) = True
-chkRels (aux,eqs,_ ) (App (C Eql) (T [e1,e2])) = eqChkZ 1 eqs e1 e2
+chkRels (aux,eqs,_ ) (App (C Eql) (T [e1,e2])) = eqChkZ 1 eqs (resetVar e1) (resetVar e2)
 chkRels (aux,eqs,rs) (App (C c) (T es)) = (c,is) `edgeHG` rs
   where (is,_) = ixsEqv es eqs
 chkRels _ _ = False
+
+chkRels' _ (C (B True)) = True
+chkRels' (aux,eqs,_ ) (App (C Eql) (T [e1,e2])) = eqChkZ 1 eqs (resetVar e1) (resetVar e2)
+chkRels' (aux,eqs,rs) (App (C c) (T es)) = (c,is) `edgeHG` rs
+  where (is,_) = ixsEqv es eqs
+chkRels' (_,eqs,_rs) e = i == j
+  where ([i,j],_) = ixsEqv [e,C(B True)] eqs
 
 -- Recursive equality check.
 eqChk :: (Exp -> Exp -> Bool) ->  Exp -> Exp -> Bool
@@ -113,6 +123,10 @@ considRels (e0@(App (C c) e)) (aux,eqs,rs) =
 considRels (e0@(App e1 e2)) (aux,eqs,rs) =
   let ([i0,i1,i2], eqs') = ixsEqv [e0,e1,e2] eqs
   in [(SLC Eql Apply, [i0,i1,i2])] |=> (aux,eqs', rs)
+
+considRels (e0@(T es)) (aux,eqs,rs) =
+  let (i:js, eqs') = ixsEqv ((T es):es) eqs
+  in ([(SLC Eql Tuple, i:js)]) |=> (aux,eqs',rs)
 
 considRels _ rs = rs
 

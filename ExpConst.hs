@@ -26,11 +26,17 @@ data Bracket = Round | Square | Curly | Angle | Oxford | Bar
   deriving (Show, Eq, Ord)
 
 data Const =
-    Apply | Tuple | Considering
+    C_None
+  | AppVar | Considering | InContextForall
+  | Apply | Tuple
   | FalToUnknown | SearchIff
   | SLC Const Const
   | RatioMultiSet Const Const
   | UserOp String
+  
+  | Aggregate Const
+  | IterVect Const
+  | NotC Const
 
   | Pow | Log | Ln | EulerE
   | Neg | Times | Div | Plus | Minus 
@@ -38,10 +44,10 @@ data Const =
   | Max | Min | Floor | Ceil
   | Subscript | Circ
   | VectorNorm
-  | Interval
+  | IntervalOO | IntervalOC | IntervalCO | IntervalCC
   | Eql | Neq | Lt | Lte | Gt | Gte | Cong
   | In | Union | Isect | Cart | Arrow | Ran | Dom
-  | Subset | Subseteq
+  | Subset | Subseteq | Subsetneq
   | And | Or | Not | Imp | Iff | IfThenElse
   | B Bool | N Rational | SetZ | SetN | SetQ | SetR | Ast
   | SetComp | SetExplicit | SetEnum | Set [Const] | PowerSet
@@ -81,11 +87,11 @@ constStrPairs = map (\p->(p,None))
   , (Log, "\\log")
   , (GCF, "\\gcf")
   , (LCM, "\\lcm")
-  , (Interval, "\\interval")
   ]
 opsIter = map (\p->(p,None))
   [ (Plus,  "\\sum")
   , (Times, "\\prod")
+  , (Circ, "\\bigcirc")
   , (Union, "\\bigcup")
   , (Isect, "\\bigcap")
   , (And, "\\bigwedge")
@@ -124,8 +130,19 @@ opsRel =
     , ((Lt,   "<"), InL)
     , ((Lte,  "\\leq"), InL)
     , ((In,   "\\in"), InL)
+    -- , ((Subsetneq, "\\subsetneq"), InL)
     , ((Subseteq, "\\subseteq"), InL)
-    , ((Subset, "\\subset"), InL) ]
+    , ((Subset, "\\subset"), InL)
+
+    , ((Neq, "\\not="), InL)
+    , ((NotC Lt, "\\not<"), InL)
+    , ((NotC Gt, "\\not>"), InL)
+    , ((NotC Gte, "\\not\\geq"), InL)
+    , ((NotC Lte, "\\not\\leq"), InL)
+    , ((NotC In, "\\not\\in"), InL)
+    , ((NotC Subseteq, "\\not\\subseteq"), InL)
+    , ((NotC Subset, "\\not\\subset"), InL)
+    ]
   ]
 opsLogic =
   [ [ ((And, "\\wedge"), InL)

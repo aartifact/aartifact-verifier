@@ -24,9 +24,10 @@ import IOParser (parseP, program, stdAloneExp)
 import IOSource
 import IOPrintFormat
 import ExpSQL (expSql)
-import Validation (validate)
+import Validation (validate, rawcxt, validate')
 import Context (shStats)
 import ContextOntology (ont)
+import ContextRaw (cxtraw)
 
 ----------------------------------------------------------------
 -- The target of the output, as specified by the command-line
@@ -42,6 +43,15 @@ showTD td = "(completed in "++
   (show$floor(((toRational$tdSec td)*(toRational$10^12)+
     (toRational$tdPicosec td))/10^9))++"ms)\n"
 
+processRawCx :: IO ()
+processRawCx =
+  do { ont <- readFile "ontology"
+     ; ont <- parseP program "<ontology>" ont
+     ; writeFile "ContextRaw.hs" $ 
+       "module ContextRaw where\nimport ExpConst\nimport Exp\nimport ContextAux\nimport MapUsingRBTree\ncxtraw="
+       ++((let r l = case l of '%':' ':'1':xs->r xs; x:xs->x:r xs; []->[] in r) $ show (rawcxt ont))
+     }
+
 process :: OutputFormat -> OutputTarget -> Bool -> String -> String -> IO ()
 process oFmt out stat fname txt =
   let (cr,wr) = case out of
@@ -49,11 +59,11 @@ process oFmt out stat fname txt =
         File outf -> (writeFile outf "", appendFile outf)
   in
   do { --ont <- readFile "ontology"
-     ; ont <- parseP program "<ontology>" ont
+     --; ont <- parseP program "<ontology>" ont
      ; t0 <- getClockTime
      ; stmts <- parseP program fname txt
      ; cr
-     ; (ss',stadat) <- return $ validate ont stmts
+     ; (ss',stadat) <- return $ validate' cxtraw stmts
      ; wr $ fmt oFmt "output" $ showStmts oFmt $ ss'
      ; t1 <- getClockTime
      ; if stat then 
@@ -75,13 +85,14 @@ processSql str =
 
 cmd :: OutputFormat -> [Bool] -> OutputTarget -> [String] -> IO ()
 cmd _    _   out ["-sqlexp", expStr] = processSql expStr
-cmd oFmt [_,stat] out ("-lit":args) = cmd oFmt [True,stat] out args
-cmd oFmt [lit,_] out ("-stat":args) = cmd oFmt [lit,True] out args
-cmd _    fls out ("-o":f:args) = cmd htmlOutFmt fls (File f) args
-cmd _    fls out ("-html":args) = cmd htmlOutFmt fls out args
+cmd oFmt [_,stat,cx] out ("-lit":args) = cmd oFmt [True,stat,cx] out args
+cmd oFmt [lit,_,cx] out ("-stat":args) = cmd oFmt [lit,True,cx] out args
+cmd oFmt [lit,stat,_] out ("-rawcxt":args) = processRawCx
+cmd _    fls out ("-o":f    :args) = cmd htmlOutFmt fls (File f) args
+cmd _    fls out ("-html"   :args) = cmd htmlOutFmt fls out args
 cmd _    fls out ("-cmdhtml":args) = cmd cmdHtmlOutFmt fls out args
-cmd _    fls out ("-ansi":args) = cmd ansiOutFmt fls out args
-cmd oFmt [lit,stat] out [s] =
+cmd _    fls out ("-ansi"   :args) = cmd ansiOutFmt fls out args
+cmd oFmt [lit,stat,_] out [s] =
   if lit then process oFmt out stat "" s
   else do {t<-readFile s; process oFmt out stat s t}
 cmd _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError 
@@ -93,7 +104,7 @@ cmd _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError
 main :: IO ()
 main =
   do{ args <- getArgs
-    ; cmd noneOutFmt [False,False] CmdLine args
+    ; cmd noneOutFmt [False,False,False] CmdLine args
     }
 
 --eof

@@ -18,8 +18,8 @@
 ----------------------------------------------------------------
 --
 
-module MapUsingRBTree (Map, emp, app, ran, preImg, set, domSize,
-                       ranSize, def, mapRan, appInDom, inDom) where
+module MapUsingRBTree where
+--(Map, emp, app, ran, preImg, set, domSize,ranSize, def, mapRan, appInDom, inDom)
 
 import Set ((\/))
 
@@ -30,8 +30,9 @@ type Map a b = Tree a b
 
 -- Define the red-black tree.
 
-data Color = R | B
+data Color = R | Bl deriving Show
 data Tree a b = NULL | Bran Color (Tree a b) (a,b) (Tree a b)
+  deriving Show
 
 emp :: Tree a b
 emp =  NULL
@@ -88,7 +89,7 @@ preImg y t = acc [] t where
   acc l (Bran _ t (x,y') t') = if y==y' then x:acc (acc l t) t' else acc (acc l t) t'
 
 set :: (Eq a, Ord a) => a -> b -> Map a b -> Map a b
-set x y (m) = def x y (\_ _->y) m
+set x y m = def x y (\_ _->y) m
 
 -- Balanced by a-inequalities.
 def :: (Eq a, Ord a) => a -> b -> (a -> b -> b) -> Tree a b -> Tree a b
@@ -98,13 +99,13 @@ def e i f s = blackify (ins s) where
     | e < e1 = bal color (ins a) (e1,y) b
     | e == e1 = Bran color a (e1,f e1 y) b
     | e > e1 = bal color a (e1,y) (ins b)
-  blackify(Bran _ a (e2,y) b) = Bran B a (e2,y) b
+  blackify(Bran _ a (e2,y) b) = Bran Bl a (e2,y) b
 
   -- Balancing function.
-  bal B (Bran R (Bran R a x b) y c) z d = Bran R (Bran B a x b) y (Bran B c z d)
-  bal B (Bran R a x (Bran R b y c)) z d = Bran R (Bran B a x b) y (Bran B c z d)
-  bal B a x (Bran R (Bran R b y c) z d) = Bran R (Bran B a x b) y (Bran B c z d)
-  bal B a x (Bran R b y (Bran R c z d)) = Bran R (Bran B a x b) y (Bran B c z d)
+  bal Bl (Bran R (Bran R a x b) y c) z d = Bran R (Bran Bl a x b) y (Bran Bl c z d)
+  bal Bl (Bran R a x (Bran R b y c)) z d = Bran R (Bran Bl a x b) y (Bran Bl c z d)
+  bal Bl a x (Bran R (Bran R b y c) z d) = Bran R (Bran Bl a x b) y (Bran Bl c z d)
+  bal Bl a x (Bran R b y (Bran R c z d)) = Bran R (Bran Bl a x b) y (Bran Bl c z d)
   bal color a x b = Bran color a x b
 
 --eof

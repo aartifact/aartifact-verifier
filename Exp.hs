@@ -55,8 +55,14 @@ mkSetComp e1 e2 = Bind SetComp (catMaybes $ map getVS ins) $ T[e1,e2]
         getVS (App (C In) (T[Var n, e2])) = Just n
         getVS _ = Nothing
 
+mkBrack0 b1 b2 e = App (C $ Brack b1 b2) e
 mkBrack Round Round e = e
 mkBrack b1 b2 e = App (C $ Brack b1 b2) e
+
+mkInterval (App (C (Brack Square Square)) e) = App (C IntervalCC) e
+mkInterval (App (C (Brack Round Square)) e) = App (C IntervalOC) e
+mkInterval (App (C (Brack Square Round)) e) = App (C IntervalCO) e
+mkInterval e = App (C IntervalOO) e
 
 ----------------------------------------------------------------
 -- Map and specialized search functions on expressions.
@@ -80,7 +86,7 @@ mpe f e = case e of
 ----------------------------------------------------------------
 -- Aggregation of all distinct subexpressions. Subexpressions
 -- occur after expressions that contain them. Subexpressions
--- under quantifiers are not included.
+-- under quantifiers or variable bind points are not included.
 
 subs :: Exp -> [Exp]
 subs e = case e of

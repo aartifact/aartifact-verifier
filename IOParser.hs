@@ -35,7 +35,7 @@ import Validation
 parseP :: Parse [Stmt] -> String -> String -> IO [Stmt]
 parseP p fname tx =
   do{ tx' <- return $ normIn tx
-    ; r <- return $ runParser p (PS tx' [fname] opsState0) "" tx'
+    ; r <- return $ runParser p (PS tx' [fname] opsState0 [True]) "" tx'
     ; return $ case r of
        Right ss -> ss
        Left e -> [SyntaxError $ srcTxtFrom tx' (errorPos e)]
@@ -48,11 +48,12 @@ parseP p fname tx =
 -- to detect recursive inclusion dependencies.
 
 type FileSysPath = String
-data ParseState = PS String [FileSysPath] OpsState
+type Flag = Bool
+data ParseState = PS String [FileSysPath] OpsState [Flag]
 type Parse a = GenParser Char ParseState a
 
 getSrc :: Parse String
-getSrc = do{ PS txt _ _ <- getState; return txt }
+getSrc = do{ PS txt _ _ _ <- getState; return txt }
 getPos = getPosition
 
 ----------------------------------------------------------------
@@ -107,8 +108,8 @@ introP =
     ; p2 <- getPos
     ; periodManyP
     ; p3 <- getPos
-    ; PS txt b ops <- getState
-    ; setState $ PS txt b (addOps (map fst xs) ops (introTyp words))
+    ; PS txt b ops flags <- getState
+    ; setState $ PS txt b (addOps (map fst xs) ops (introTyp words)) flags
     ; return $ [Text (srcTxt src p0 p1), 
                 Intro (srcTxt src p1 p2) (introTyp words) xs, 
                 Text (srcTxt src p2 p3)]
@@ -119,6 +120,7 @@ expStmtP ks stmt =
   do{ src <- getSrc
     ; p1 <- getPos
     ; keysP ks
+    ; _ <- many uuidP
     ; (e,s,(p2,p3)) <- phraseP
     ; periodManyP
     ; p4 <- getPos
@@ -155,7 +157,7 @@ expNoCommaP =
 
 expNoRelP :: Parse Exp
 expNoRelP =
-  do{ (PS _ _ (_:opsSet:opsArith:_, _)) <- getState
+  do{ PS _ _ (_:opsSet:opsArith:_, _) _ <- getState
     ; e <- (opsP opsSet).
            (listSepApp (reservedOp "\\times") mkProd).
            (opsP opsArith)
@@ -183,9 +185,14 @@ expNoAppP =
    <?> "simple expression"
 
 expAtom :: Parse Exp
-expAtom = 
-     try (bracks "||" "||" VectorNorm expP)
+expAtom =
+     try (expVectorIterP ("+", Plus))
+ <|> try (expVectorIterP ("*", Times))
+ <|> try (expVectorIterP ("\\cdot", Times))
+ <|> try (bracks "||" "||" VectorNorm expP)
  <|> try (bracks "|" "|" (Brack Bar Bar) expP)
+ <|> expFracP
+ <|> expIntervalP
  <|> bracks "\\lceil" "\\rceil" Ceil expP
  <|> bracks "\\lfloor" "\\rfloor" Floor expP
  <|> angles "\\langle" "\\rangle" (Brack Round Round) expP
@@ -199,6 +206,25 @@ expAtom =
  <|> (try $ mathbraces setCompP)
  <|> (try $ mathbraces setP)
  <?> "atomic expression"
+
+expIntervalP =
+  do{ reserved "\\interval"
+    ; e <- expAtom
+    ; return $ mkInterval e
+    }
+
+expVectorIterP (opStr,con) =
+  do{ e1 <- varP
+    ; reservedOp "_"
+    ; e1' <- expAtom
+    ; reservedOp opStr
+    ; reservedOp "\\ldots" <|> reservedOp "..."
+    ; reservedOp opStr
+    ; e2 <- varP
+    ; reservedOp "_"
+    ; e2' <- expAtom
+    ; return $ App (C (IterVect con)) (T[e1,e1',e2,e2'])
+    }
 
 quantP :: String -> ([(Name, Maybe Exp)] -> Exp -> Exp) -> Parse Exp
 quantP str cnstrct =
@@ -229,7 +255,15 @@ quantVarWithIn =
     }
 
 iterP :: Parse Exp
-iterP = iter1P <?|> iter0P
+iterP = iter1P <?|> iter2P <?|> iter0P
+
+iter0P :: Parse Exp
+iter0P =
+  do{ op <- iterOps
+    ; e2 <- expNoRelP <|> expAtom
+    ; return $ App (C $ Aggregate op) e2
+    }
+    <?> "iterated operator application"
 
 iter1P :: Parse Exp
 iter1P =
@@ -245,8 +279,8 @@ iter1P =
     }
     <?> "iterated operator application"
 
-iter0P :: Parse Exp
-iter0P =
+iter2P :: Parse Exp
+iter2P =
   do{ op <- iterOps
     ; reservedOp "_"; reservedOp "{"
     ; x <- nameP
@@ -297,6 +331,14 @@ ifThenElseP =
     ; return $ App (C IfThenElse) (T[e1,e2,e3])
     }
 
+expFracP :: Parse Exp
+expFracP =
+  do{ reserved "\\frac"
+    ; e1 <- between (symb "{") (symb "}") expP
+    ; e2 <- between (symb "{") (symb "}") expP
+    ; return $ App (C Div) (T[e1,e2])
+    }
+
 rootP :: Parse Exp
 rootP =
   do{ reserved "\\sqrt"
@@ -315,7 +357,7 @@ rootP' =
 opsRelP :: Parse Exp -> Parse Exp
 opsRelP p =
   do{ e <- p
-    ; (PS _ _ (opsRel:_, _)) <- getState
+    ; PS _ _ (opsRel:_, _)_ <- getState
     ; opLL' <- return $ opLL opsRel
     ; rest <- many$do{ o<-foldr (<|>) (last opLL') (init opLL'); e<-p; return (o,e)}
     ; return $ if rest==[] then e else listAnd $ mkRelExp e rest
@@ -346,13 +388,13 @@ expNumP =
 constP ((op,str),_) = do{reserved str; return $ C op}<?>str
 opP ((op,str),_) = do{reserved "\\nofix"; braces (reservedOp str); return $ C op}
 varOrConstP = 
-  do{ PS _ _ (_,[uCs]) <- getState
+  do{ PS _ _ (_,[uCs]) _ <- getState
     ; foldr (<?|>) varP (map opP opsAll ++ map constP (constAll++uCs))
     } <?> "constant or variable"
 
 varP =
   do{ x <- nameP;
-    ; PS _ _ ops <- getState
+    ; PS _ _ ops _ <- getState
     ; if (fst x) `elem` (opsStrTbl ops) then pzero else return $ Var x
     } <?> "variable"
 
@@ -379,7 +421,7 @@ phraseOps s =
 
 phraseP :: Parse (Exp, Src, (SourcePos, SourcePos))
 phraseP =
-  do{ PS txt _ _ <- getState
+  do{ PS txt _ _ _ <- getState
     ; buildExpressionParser (phraseOps txt) phraseAndP
     }
   <?> "logical expression (English)" 
@@ -396,6 +438,7 @@ phraseNoAndP =
      phraseForall
  <|> phraseExists
  <|> phraseConsidering
+ <|> phraseInContextForall
  <|> phraseIfThen
  <|> phraseNot
  <|> bracksIgnP "{" "}" (phraseP)  --(phraseIsP <?|> phraseP)
@@ -431,13 +474,24 @@ phraseConsidering =
   do{ s <- getSrc
     ; p1 <- getPos
     ; keysP ["considering"]
-    ; (e1,src1,(p2,p3)) <- phraseMathP
+    ; (e1,src1,(p2,p3)) <- phraseMathP <|> (braces phraseP)
     ; commaP
     ; (e2,src2,(p4,p5)) <- phraseP
     ; return $ (Bind Considering (fv [] e1) (T[e1,e2]), 
                 SrcL [srcTxt s p1 p2,srcTxt s p3 p4] [src1, src2], 
                 (p1,p5))
     } <?> "\'considering\' phrase (English)"
+
+phraseInContextForall =
+  do{ s <- getSrc
+    ; p1 <- getPos
+    ; keysP ["in context for all"]
+    ; commaP
+    ; (e,src,(p2,p3)) <- phraseP
+    ; return $ (Bind InContextForall (fv [] e) e, 
+                SrcL [srcTxt s p1 p2] [src], 
+                (p1,p3))
+    } <?> "\'in context for all\' phrase (English)"
 
 phraseIfThen =
   do{ s <- getSrc
@@ -589,6 +643,9 @@ wordP = do{w <- symb "-"; return "-"} <|> wordP'
 wordP' :: Parse String
 wordP' = do{w <- idP; if w!!0 == '\\' then pzero else return w}
 
+uuidP :: Parse String
+uuidP = do{symb "~"; uuid <- many1 (alphaNum <|> (char '-')); symb "~"; return uuid}
+
 {- wordP'' = 
   do{ c0 <- letter <|> oneOf "\\"
     ; cs <- many (alphaNum <|> oneOf "'")
@@ -619,7 +676,10 @@ langDef
       forallKeys ++ existsKeys ++
       iffKeys ++ impliesKeys ++ suchThatKeys ++
       ["and", ", and", "or"] ++
+      ["\\not"]++
+      ["\\interval"]++
       ["\\forall", "\\exists", "\\if", "\\then", "\\else", "\\sqrt",
+       "\\frac",
        "\\nofix", "\\p", "\\l",
        ".", "\\\\", "|", "\\[", "\\]", 
        "\\{", "\\}", "\\langle", "\\rangle",

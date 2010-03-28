@@ -15,7 +15,7 @@
 ----------------------------------------------------------------
 -- 
 
-module Validation (validate) where
+module Validation (validate, rawcxt, validate') where
 
 import IOPrintFormat
 import IOSource
@@ -32,6 +32,10 @@ import ValidationSearch (verify)
 validate :: [Stmt] -> [Stmt] -> ([Stmt], Stat)
 validate ont ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 ont') ss
   where ont' = concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
+
+validate' cxtraw ss = (\(ss,(_,_,st))->(ss,st)) $ execs cxtraw ss
+
+rawcxt ont = state0 $ concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
 
 exec :: Context -> Stmt -> ([Stmt], Context)
 exec state (s@(Text _)) = ([s], state)
@@ -78,10 +82,10 @@ vArt :: Context -> Exp -> Src -> Src
 vArt s e (SrcIg [l,src,r]) = SrcIg [l,vArt s e src,r]
 vArt s (Forall vs (App (C Imp) (T[e1,e2]))) (SrcL ts [s1,s2]) =
   SrcL ts [vAsu (updVars vs s) e1 s1, vArt (assumeCxt e1 (updVars vs s)) e2 s2]
-vArt s (Exists vs (App (C And) (T[e1,e2]))) (SrcL ts [s1,s2]) = 
-  SrcL ts [vArt (updVars vs s) e1 s1, vArt (assumeCxt e1 (updVars vs s)) e2 s2]
+--vArt s (Exists vs (App (C And) (T[e1,e2]))) (SrcL ts [s1,s2]) = 
+--  SrcL ts [vArt (updVars vs s) e1 s1, vArt (assumeCxt e1 (updVars vs s)) e2 s2]
 vArt s (App (C And) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vArt s e1 s1, vArt (assumeCxt e1 s) e2 s2]
-vArt s (App (C Or)  (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vArt s e1 s1, vArt s e2 s2]
+--vArt s (App (C Or)  (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vArt s e1 s1, vArt s e2 s2]
 vArt s (App (C Imp) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vAsu s e1 s1, vArt (assumeCxt e1 s) e2 s2]
 vArt s (App (C Iff) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vArt (assumeCxt e2 s) e1 s1, vArt (assumeCxt e1 s) e2 s2]
 vArt s (App (C Not) e) (SrcL ts [src]) = SrcL ts [vArt s e src]
