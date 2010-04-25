@@ -151,7 +151,7 @@
 	Assume ~a694472a-8909-102d-98a8-489929fe8188~ considering $x/y$, $x \geq 0$ and $y > 0$ and $x \geq y$ implies that $x/y \geq 1$.
 	Assume ~856a46a2-8909-102d-98a8-489929fe8188~ considering $x/y$, $x \geq 0$ and $y > 0$ and $x \leq y$ implies that $x/y \leq 1$.
 	Assume ~59f7e3ea-4346-102d-a4b9-7e3ebefcb69b~ considering $x/y$, $x \in \Q$, $y \in \Q$, and $y \neq 0$ implies that $x / y \in \Q$.
-	Assume ~8c2170d4-8b3f-102d-98a8-489929fe8188~ considering $x/y$, $x \neq 0$ and $y \neq 0$ implies that $x/y = 1/(y/x)$.
+	Assume ~2a863f9a-8d6b-102d-98a8-489929fe8188~ considering $x/y$, $x \neq 0$ and $y \neq 0$ implies that \l{$y/x$ is the multiplicative inverse of $x/y$}.
 	Assume ~a87b5f48-43bf-102d-a4b9-7e3ebefcb69b~ considering $x^y$, $x > 0$ and $y \in \R$ implies $x^y > 0$.
 	Assume ~3d85466b-43bf-102d-a4b9-7e3ebefcb69b~ considering $x^y$, $x \in \Q$ and $y \in \Z$ implies that $x ^ y \in \Q$.
 	Assume ~a18f6615-4345-102d-a4b9-7e3ebefcb69b~ considering $x^y$, $x \in \Z$, $y \in \N$, $x^y$ is even implies $x$ is even.
@@ -232,6 +232,7 @@
 	Assume ~81e9656b-8923-102d-98a8-489929fe8188~ for all $a,b,c,d$, $a \geq b$ and $c > d$ implies that $a+c > b+d$.
 	Assume ~7bd54752-30c3-102d-a257-75dae2e0ba06~ for all $f,X,Y$, if $f \in X \rightarrow Y$ then $\dom(f) \subseteq X$, $\ran(f) \subseteq Y$, and $f$ is a map.
 	Assume ~4277e4cf-5515-102d-9dc1-60fdd73a9e68~ for all $i, j, X, k, l, Y$, $j \geq k$ and \l{$X$ is the set of integers from $i$ to $j$} and \l{$Y$ is the set of integers from $k$ to $l$} implies that \l{$X \cup Y$ is the set of integers from $i$ to $l$}.
+	Assume ~73bbbacf-8da6-102d-98a8-489929fe8188~ for all $S$, \l{$S$ is non-empty} implies that $S \neq \emptyset$.
 	Assume ~547988be-489a-102d-a4b9-7e3ebefcb69b~ for all $V$, $V$ is a set implies that $V^\ast$ is a set of vectors.
 	Assume ~7ec0ce4d-6d67-102d-8ac3-13f594086af9~ for all $V$, $V$ is a set of vectors implies that $V$ is a set.
 	Assume ~00a9759c-489a-102d-a4b9-7e3ebefcb69b~ for all $v,V,i$, if \l{$v$ is an infinite sequence of elements from $V$} and $i \in \N$ then $v \in V^\ast$.
@@ -341,7 +342,11 @@
 	Assume ~4c02756e-6cca-102d-8ac3-13f594086af9~ for any $S$, if \l{$S$ is a singleton} then \l{$S$ is a finite set} and \l{$S$ is non-empty}.
 	Assume ~0a6a4fd8-5912-102d-885a-0a90b4d718f3~ for any $S$, if \l{$S$ is the set corresponding to the relational operator $\nofix{<}$} then $S \subset \R \times \R$, \l{$S$ is a strict total order over $\R$}.
 	Assume ~0e9a8b0b-5914-102d-885a-0a90b4d718f3~ for any $S$, if \l{$S$ is the set corresponding to the relational operator $\nofix{\leq}$} then $S \subset \R \times \R$, \l{$S$ is a non-strict total order over $\R$}.
+	Assume ~7b05644d-8da7-102d-98a8-489929fe8188~ for any $S$, \l{$S$ is a non-empty set} iff \l{$S$ is a set} and \l{$S$ is non-empty}.
+	Assume ~039151e1-8da7-102d-98a8-489929fe8188~ for any $S$, \l{$S$ is an empty set} iff \l{$S$ is the empty set}.
+	Assume ~2fcf7cf3-8da6-102d-98a8-489929fe8188~ for any $S$, \l{$S$ is empty} implies that $S = \emptyset$.
 	Assume ~1d5203f2-6e11-102d-8ac3-13f594086af9~ for any $S$, \l{$S$ is of finite size} and \l{$S$ is a set} iff \l{$S$ is a finite set}.
+	Assume ~fc2607e9-8da6-102d-98a8-489929fe8188~ for any $S$, \l{$S$ is the empty set} iff \l{$S$ is a set} and \l{$S$ is empty}.
 	Assume ~64739ccf-6ccb-102d-8ac3-13f594086af9~ for any $s,c,S,k$, if \l{the elements of $S$ are bounded above by $k$}, \l{$c$ is the size of $S$}, and \l{$s$ is the sum of $S$} then $s \leq c*k$.
 	Assume ~7ecd4066-6ccb-102d-8ac3-13f594086af9~ for any $s,c,S,k$, if \l{the elements of $S$ are bounded below by $k$}, \l{$c$ is the size of $S$}, and \l{$s$ is the sum of $S$} then $s \geq c*k$.
 	Assume ~c727a534-6cc1-102d-8ac3-13f594086af9~ for any $s,c,S,k$, if \l{the elements of $S$ are strictly bounded above by $k$}, \l{$c$ is the size of $S$}, and \l{$s$ is the sum of $S$} then $s < c*k$.
@@ -427,8 +432,12 @@
 	Assume ~8711e177-5516-102d-9dc1-60fdd73a9e68~ for any $X,Y,i,j$, \l{$X$ is the set of integers from $i$ to $j$} and  \l{$Y$ is the set of integers from $i$ to $j$} implies $X = Y$.
 	Assume ~57623e7e-6b08-102d-8ac3-13f594086af9~ for any $x,y,X,Y$ \l{$x$ is the sum of a finite subset $X$ of $\N$}, \l{$y$ is the sum of a finite subset $Y$ of $\N$}, and $X \subset Y$ implies that $x < y$.
 	Assume ~285e943a-6b08-102d-8ac3-13f594086af9~ for any $x,y,X,Y$ \l{$x$ is the sum of a finite subset $X$ of $\N$}, \l{$y$ is the sum of a finite subset $Y$ of $\N$}, and $X \subseteq Y$ implies that $x \leq y$.
+	Assume ~0722bba7-a202-102d-9a6f-4d2f027c6894~ for any $x,y,z$, $x + y < x + z$ implies that $y < z$.
+	Assume ~df5027c4-a201-102d-9a6f-4d2f027c6894~ for any $x,y,z$, $x + y \leq x + z$ implies that $y \leq z$.
+	Assume ~eff1f479-8dab-102d-98a8-489929fe8188~ for any $X,Y,Z$, $X \subseteq Z$ and $Y \subseteq Z$ implies that $X \cup Y \subseteq Z$.
 	Assume ~7f884b40-5eae-102d-885a-0a90b4d718f3~ for any $x,y,z$, if \l{$x$ is a factor of $y$} and \l{$x$ is a factor of $z$} then $\gcf(y,z) \geq x$.
 	Assume ~70f25914-5eae-102d-885a-0a90b4d718f3~ for any $x,y,z$, if \l{$x$ is a factor of $y$} and \l{$x$ is a factor of $z$} then $\gcf(z,y) \geq x$.
+	Assume ~d08c91ba-8beb-102d-98a8-489929fe8188~ for any $x,y,z$, \l{$x$ is the multiplicative inverse of $z$} and \l{$y$ is the multiplicative inverse of $z$} implies that $x = y$.
 	Assume ~923e9bc8-6ffa-102d-8ac3-13f594086af9~ in context for all, $P(0)$ implies that \l{$P$ is a predicate that satisfies the base step for natural numbers}.
 	Assume ~590ffb6c-7152-102d-8ac3-13f594086af9~ in context for all, \l{$X$ is a non-empty set} implies that there exists $x$ s.t. $x \in X$.
 	Assume ~7406893f-6ffa-102d-8ac3-13f594086af9~ in context for all, {for all $n$, $n \in \N$ implies that {$n \in U$ implies that $n+1 \in U$}} implies that \l{$U$ is a set that satisfies the inductive step for natural numbers}.
