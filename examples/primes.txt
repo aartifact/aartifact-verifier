@@ -1,0 +1,37 @@
+We want to show that there are infinitely many primes. We will argue this by assuming the opposite and deriving a contradiction.
+
+== Argument ==
+
+We introduce a finite set $P$ of all primes, and its product $m$.
+
+\vbeg
+Introduce $P,m$.
+
+Assume for all $n \in \N$, if \l{$n$ is prime} then $n \in P$.
+
+Assume \l{$P$ is a finite set}, \l{$P$ is non-empty}, and $P \subset \N$.
+
+Assume $m = P_0 \cdot \ldots \cdot P_{|P|-1}$.
+\vend
+
+The above notation for the product of a subset of $\R$ has equivalent alternatives.
+
+\vbeg
+Assert $m = \prod P$.
+
+Assert $m = \prod_{x \in P} x$. 
+\vend
+
+We now demonstrate that the above assumptions allow us to derive a contradiction.
+
+\vbeg
+Assert $m \in \N$.
+
+Assert for any $p \in \N$, 
+:if \l{$p$ is a prime factor of $m+1$} then
+::\l{$p$ is not a factor of $m$},
+::\l{$p$ is prime},
+::$p \in P$,
+::\l{$p$ is a factor of $m$},
+::\l{there is a contradiction}.
+\vend
