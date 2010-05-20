@@ -63,6 +63,12 @@ addLawHG (ls,g) (r,o) = ((marked,((map fst r, map snd r),o)):ls,g')
 edgeHG :: (Eq a, Ord a, Eq b) => Edge a b -> Hypergraph a b -> Bool
 edgeHG (e,ns) (_,g) = ns `elem` [ns | (_,ns) <- maybe [] snd $ app e g]
 
+reportHG :: (Eq a, Ord a, Show a, Eq b) => ([b] -> Bool) -> Hypergraph a b -> [(a,[b])]
+reportHG f (_,g) =
+  let l = list g
+      l' =  concat [map (\y -> (x,y)) ys | (x,ys) <- [ (x, map snd ys) | (x,(_,ys)) <- l]]
+  in [(x,y) | (x,y) <- l', f y]
+
 relabelHG :: (Eq a, Ord a, Eq b) => Hypergraph a b -> b -> b -> Hypergraph a b
 relabelHG (ls,g) j j' = (ls, mapRan (\_ (mrk,es) -> (mrk, map relbl es)) g)
   where relbl (m,is) = (m, [if i==j then j' else i | i<-is])

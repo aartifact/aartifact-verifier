@@ -68,6 +68,7 @@ data Err = ErrUnbound [String] | ErrVer String
 data Src =
     Src String
   | SrcStat Stat Src
+  | SrcReport Report Src
   | SrcOk Src
   | SrcErr Src Err
   | SrcL [String] [Src]
@@ -80,6 +81,7 @@ showWithErr oFmt err s = case err of
 showSrc oFmt src = case src of
   Src s -> fmt oFmt "string" s
   SrcStat _ s -> showSrc oFmt s
+  SrcReport _ s -> showSrc oFmt s
   SrcOk s -> fmt oFmt "valid" $ showSrc oFmt s
   SrcErr s err -> showWithErr oFmt err $ showSrc oFmt s
   SrcL ts ss -> sht ts ss where
@@ -95,6 +97,7 @@ isErr :: Src -> Bool
 isErr s = case s of
   Src _ -> False
   SrcStat _ s -> isErr s
+  SrcReport _ s -> isErr s
   SrcOk _ -> False
   SrcErr _ _ -> True
   SrcL _ srcs -> or $ map isErr srcs
@@ -103,6 +106,7 @@ isErr s = case s of
 statSrc s = case s of
   Src _ -> [[], []]
   SrcStat s _ -> s
+  SrcReport s _ -> [[], []]
   SrcOk s -> statSrc s
   SrcErr s _ -> statSrc s
   SrcL _ ss -> statSrc $ last ss
@@ -116,7 +120,7 @@ data IntroTyp = Variable | Constant | RelOp | SetOp | ArithOp
 data ExpTyp = Assume | Assert | Consider
 data Stmt =
     Text String
-  | Intro String IntroTyp [Name]
+  | Intro Src IntroTyp [Name]
   | ExpStmt ExpTyp (Exp, Src)
   | Include String [Stmt]
   | IncludeWrap String Stmt
@@ -130,14 +134,16 @@ mkIncludeWrap n r = IncludeWrap n r
 showStmt :: OutputFormat -> Stmt -> String
 showStmt oFmt r = case r of
   Text srcStr -> fmt oFmt "string" srcStr
-  Intro srcStr _ _ -> fmt oFmt "valid" $ fmt oFmt "string" srcStr
+  Intro src _ _ -> showSrc oFmt src
   ExpStmt _ (_,src) -> showSrc oFmt src
   IncludeWrap n r  -> "Included dependency processed."     --fmt html "green" $ "In [["++n++"]]: "
   SystemError s -> "\n *** System error *** : " ++ s
   SyntaxError s -> fmt oFmt "invalid" $ "\n\n *** Syntax error in statement immediately below *** : \n\n" ++ s
 
 showStmts :: OutputFormat -> [Stmt] -> String
-showStmts oFmt rs = fmtIgnore oFmt $ normOut $ foldr (++) "" $ map (showStmt oFmt) rs
+showStmts oFmt rs = case getReportStmts rs of
+  Nothing -> fmtIgnore oFmt $ normOut $ foldr (++) "" $ map (showStmt oFmt) rs
+  Just r -> r
 
 fmtIgnore oFmt str = fmt oFmt "ignore" $ pr str where
   pr str = case str of 
@@ -145,5 +151,28 @@ fmtIgnore oFmt str = fmt oFmt "ignore" $ pr str where
     ('\\':'v':'e':'n':'d':cs) -> fmt oFmt "ignore-left" "\\vend" ++ pr cs
     (c:cs) -> c:pr cs
     [] -> []
+
+----------------------------------------------------------------
+-- Collects the state report from the results, if there is one.
+
+type Report = String
+
+getReportStmts :: [Stmt] -> Maybe Report
+getReportStmts ss = case concat (map getReportStmt ss) of
+  [] -> Nothing
+  r:_ -> Just r
+
+getReportStmt :: Stmt -> [Report]
+getReportStmt (ExpStmt _ (_,src)) = getReportSrc src
+getReportStmt _ = []
+
+getReportSrc src = case src of
+  Src _ -> []
+  SrcStat _ s -> []
+  SrcReport r s -> [r]
+  SrcOk _ -> []
+  SrcErr _ _ -> []
+  SrcL _ srcs -> concat $ map getReportSrc srcs
+  SrcIg srcs -> concat $ map getReportSrc srcs
 
 --eof

@@ -15,7 +15,7 @@
 ----------------------------------------------------------------
 -- 
 
-module Validation (validate, rawcxt, validate') where
+module Validation (rawcxt, validate) where
 
 import IOPrintFormat
 import IOSource
@@ -29,19 +29,18 @@ import ValidationSearch (verify)
 -- Process a list of statements while maintaining a context,
 -- and validate expressions with respect to this context.
 
-validate :: [Stmt] -> [Stmt] -> ([Stmt], Stat)
-validate ont ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 ont') ss
-  where ont' = concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
+--validate :: [Stmt] -> [Stmt] -> ([Stmt], Stat)
+--validate ont ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 ont') ss
+--  where ont' = concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
 
-validate' cxtraw ss = (\(ss,(_,_,st))->(ss,st)) $ execs cxtraw ss
-
+validate cxtraw ss = (\(ss,(_,_,st))->(ss,st)) $ execs cxtraw ss
 rawcxt ont = state0 $ concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
 
 exec :: Context -> Stmt -> ([Stmt], Context)
 exec state (s@(Text _)) = ([s], state)
 exec state (s@(SyntaxError _)) = ([s], state)
-exec state (s@(Intro _ Variable vs)) = ([s], updVars vs state)
-exec state (s@(Intro srcStr _ vs)) = ([s], updConsts vs state)
+exec state (Intro src Variable vs) = ([Intro (SrcOk src) Variable vs], updVars vs state)
+exec state (Intro src ty vs) = ([Intro (SrcOk src) ty vs], updConsts vs state)
 exec state (ExpStmt Assert (e,src)) = ([ExpStmt Assert (e',src')], state'')
   where state'' = updStat stat' $ if isErr src' then considerCxt e' state' else assumeCxt e' state'
         stat' = statSrc src'
@@ -89,6 +88,7 @@ vArt s (App (C And) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vArt s e1 s1, vArt 
 vArt s (App (C Imp) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vAsu s e1 s1, vArt (assumeCxt e1 s) e2 s2]
 vArt s (App (C Iff) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vArt (assumeCxt e2 s) e1 s1, vArt (assumeCxt e1 s) e2 s2]
 vArt s (App (C Not) e) (SrcL ts [src]) = SrcL ts [vArt s e src]
+vArt s (App (C MakeReport) (T es)) src = SrcReport (reportCxt es (considerCxt (T es) s)) src
 vArt s e src = 
   let fvs = fv (varsCxt s) e
   in if length fvs > 0 then SrcErr src (ErrUnbound (map fst fvs)) else

@@ -88,6 +88,11 @@ preImg y t = acc [] t where
   acc l NULL = l
   acc l (Bran _ t (x,y') t') = if y==y' then x:acc (acc l t) t' else acc (acc l t) t'
 
+list :: (Eq a, Eq b, Ord a) => Tree a b -> [(a,b)]
+list t = case t of
+  NULL -> []
+  Bran _ t1 xy t2 -> xy:(list t1 ++ list t2)
+
 set :: (Eq a, Ord a) => a -> b -> Map a b -> Map a b
 set x y m = def x y (\_ _->y) m
 

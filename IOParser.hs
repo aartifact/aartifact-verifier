@@ -111,7 +111,7 @@ introP =
     ; PS txt b ops flags <- getState
     ; setState $ PS txt b (addOps (map fst xs) ops (introTyp words)) flags
     ; return $ [Text (srcTxt src p0 p1), 
-                Intro (srcTxt src p1 p2) (introTyp words) xs, 
+                Intro (Src (srcTxt src p1 p2)) (introTyp words) xs, 
                 Text (srcTxt src p2 p3)]
     }
   <?> "variable or operator introduction"
@@ -443,10 +443,14 @@ phraseNoAndP =
  <|> phraseNot
  <|> bracksIgnP "{" "}" (phraseP)  --(phraseIsP <?|> phraseP)
  <|> bracksIgnP "(" ")" (phraseP)  -- (wStr $ parens phraseP)
- <|> phrasePred "\\p" NLPredC
- <|> phrasePred "\\l" NLPredLC
+ <|> phrasePreds
  <|> (try phrasePredBare')
  <|> phraseMathP
+ <|> phraseMakeReport
+
+phrasePreds = 
+     phrasePred "\\p" NLPredC
+ <|> phrasePred "\\l" NLPredLC
 
 phraseForall = phraseQ (keysP forallKeys) (do{commaP;return ""}) Forall Imp
   <?> "universal quantification (English)"
@@ -526,7 +530,7 @@ phrasePred flagStr con =
   do{ s <- getSrc
     ; p1 <- getPos
     ; reserved flagStr
-    ; ews <- braces (many1 (phrasePredSubExp <|> phrasePredWord'' <|> phrasePredWordIs))
+    ; ews <- braces (many1 (phrasePredSubExp <|> phrasePredWord'' <|> phrasePredWordIs <|> phrasePredSubPred))
     ; p2 <- getPos
     ; return $ (mkNLPred con ews, Src $ srcTxt s p1 p2, (p1,p2))
     }
@@ -537,6 +541,8 @@ phrasePredWord'' = do{w <- wordP''; return $ Right w} where
   wordP'' = reservedAsWordP "and" <|> wordP
   reservedAsWordP r = do{_ <- reserved r; return r}
 phrasePredWordIs = do{ reserved "is"; return $ Right "is"}
+
+phrasePredSubPred = do{ (e,_,_) <- phrasePreds; return $ Left e}
 
 phrasePredBare' =
   do{ s <- getSrc
@@ -561,6 +567,16 @@ phrasePredBare2 =
     ; if hasRight ews then return $ mkNLPred NLPredLC ews else pzero
     }
     <?> "predicate expression (English)"
+
+phraseMakeReport =
+  do{ s <- getSrc
+    ; pos1 <- getPos
+    ; symb "?"
+    ; es <- sepBy expNoCommaP commaSep
+    ; symb "?"
+    ; pos2 <- getPos  
+    ; return $ (App (C MakeReport) (T es), Src $ srcTxt s pos1 pos2, (pos1,pos2))
+    }
 
 hasRight (Right x:xs) = True
 hasRight (_:xs) = hasRight xs

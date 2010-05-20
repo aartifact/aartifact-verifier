@@ -27,6 +27,7 @@ data Bracket = Round | Square | Curly | Angle | Oxford | Bar
 
 data Const =
     C_None
+  | MakeReport
   | AppVar | Considering | InContextForall
   | Apply | Tuple
   | FalToUnknown | SearchIff
