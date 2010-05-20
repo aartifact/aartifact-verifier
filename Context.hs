@@ -19,6 +19,7 @@ import Set
 import MatchingIndex
 import ExpConst
 import Exp
+import ExpPrint
 import ContextEquiv
 import ContextHypergraph
 import ContextRelations
@@ -142,6 +143,11 @@ considerCxt1 :: Exp -> Context -> Context
 considerCxt1 e (vcs,(aux0,eqs0,hg0),stat) =
   let rs' = considAux2 e (aux0,eqs0,resetMarksHG hg0)
   in (vcs,closureRels rs',stat)
+
+reportCxt :: [Exp] -> Context -> String
+reportCxt es (_,rels,_) = "~@"++str++"@~"
+  where str = foldr (\x y -> x++"|"++y) (last l) (init l)
+        l = map expPrint $ reportRels es rels
 
 addLaw :: Relations -> Exp -> Relations
 addLaw rs e = foldr (\add rs-> add rs e) rs [addAuxLaw,addRelLaw]

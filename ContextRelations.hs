@@ -18,8 +18,9 @@
 
 module ContextRelations (considRels, addRelLaw, updRels, updRels'',
                          updRelsTrue, updRelsEq, chkRels, chkRels', eqChkZ, 
-                         closureRels, ixsEqv) where
+                         closureRels, ixsEqv, reportRels) where
 
+import Set
 import MatchingIndex
 import ExpConst (Const(..))
 import Exp (Exp(..), splitAnd, fv, eqOpen, subs, consts, bOp)
@@ -58,6 +59,8 @@ chkRels _ (C (B True)) = True
 chkRels (aux,eqs,_ ) (App (C Eql) (T [e1,e2])) = eqChkZ 1 eqs (resetVar e1) (resetVar e2)
 chkRels (aux,eqs,rs) (App (C c) (T es)) = (c,is) `edgeHG` rs
   where (is,_) = ixsEqv es eqs
+chkRels (aux,eqs,rs) (App (C c) e) = (c,is) `edgeHG` rs
+  where (is,_) = ixsEqv [e] eqs
 chkRels _ _ = False
 
 chkRels' _ (C (B True)) = True
@@ -74,6 +77,14 @@ eqChk eq e e' = eqOpen (eqChk eq) e e' || eq e e'
 eqChkZ :: Int -> Equivalence Exp Index -> Exp -> Exp -> Bool
 eqChkZ 0 er e1 e2 = eqChk (\e1-> \e2-> (chkEquality er e1 e2) || (e1==e2)) e1 e2
 eqChkZ n er e1 e2 = eqChk (\e1-> \e2-> (eqChkZ (n-1) er e1 e2)) e1 e2
+
+-- Reporting on expressions.
+reportRels es (_,eqs,rs) = [(App (C p) (T (map (conv eis) is))) | (p,is) <- l'']
+  where l'' = reportHG (\is' -> is' `subset` is) rs
+        (is,_) = ixsEqv es eqs
+        eis = zip es is
+        conv ((e,i):eis) i' = if i==i' then e else conv eis i'
+        conv _ _ = C C_None
 
 closureRels (aux,eqs,hg) = (aux,eqs',hg') where (eqs',hg') = closureHG' Eql (eqs,hg)
 
@@ -105,7 +116,7 @@ considRels (e0@(App (C (NLPredLC _)) (T es))) (aux,eqs,rs) =
   in foldr considRels' (aux,eqs',rs) es
 
 considRels (e0@(App (C c) (T es))) (aux,eqs,rs) =
-  if c `elem` [Pow,Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,SetExplicit,GCF,LCM] then
+  if c `elem` [Or,Pow,Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,SetExplicit,GCF,LCM] then
     let (i1:is, eqs') = ixsEqv ([e0]++es) eqs
         ls = if c==SetExplicit then [(In, [j,i1]) | j <- is] else []
         rs' = (ls++[(SLC Eql c, i1:is)]) |=> (aux,eqs', rs)
