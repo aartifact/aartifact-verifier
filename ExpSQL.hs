@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -309,11 +309,9 @@ isLogical (Bind Considering _ _) = True
 isLogical (Bind InContextForall _ _) = True
 isLogical _ = False
 
-bins = [Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,
-        Eql,Neq,Lt,Lte,Gt,Gte,Subset,Subseteq,In,Pow,Circ,
+binsOps = [Plus,Minus,Times,Div,Mod,Otimes,Oplus,Union,Isect,Cart,Arrow,Pow,Circ]
+bins = binsOps ++ [Eql,Neq,Lt,Lte,Gt,Gte,Subset,Subseteq,In,
         NotC Lt, NotC Lte, NotC Gt, NotC Gte, NotC In, NotC Subset, NotC Subseteq]
-
-binsOps = [Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,Pow,Circ]
 
 mkExpBraced (Forall _ _) l = [Syn "\\lbrace"]++l++[Syn "\\rbrace"]
 mkExpBraced (Exists _ _) l = [Syn "\\lbrace"]++l++[Syn "\\rbrace"]
@@ -337,6 +335,8 @@ showC' c = case c of
   Pow -> "^"
   Circ -> "\\circ"
   PowerSet -> "\\powerset"
+  Otimes -> "\\otimes"
+  Oplus -> "\\oplus"
   Union -> "\\cup"
   Isect -> "\\cap"
   Cart -> "\\times"

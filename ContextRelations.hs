@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -24,6 +24,7 @@ import Set
 import MatchingIndex
 import ExpConst (Const(..))
 import Exp (Exp(..), splitAnd, fv, eqOpen, subs, consts, bOp)
+import ExpPredicate (PredWrap(..))
 import ExpSubst (resetVar)
 import ContextEquiv
 import ContextHypergraph
@@ -33,39 +34,48 @@ import ContextHypergraph
 
 -- This wrapper is needed in case the expression contains
 -- local variables.
+ixsEqv :: [Exp] -> Equivalence Exp Index -> ([Index], Equivalence Exp Index)
 ixsEqv es eqs = getIxsWithPut (map resetVar es) eqs
 ixsEqv' es eqs = getIxsWithPut es eqs
 
+type Relations a = (a, Equivalence Exp Index, Hypergraph PredWrap Index)
+
+updRels'' :: Relations a -> Exp -> Relations a
 updRels'' rs (e@(App (C _) _)) = updRels rs e
 updRels'' rs e = updRelsTrue rs (resetVar e)
 
+updRels :: Relations a -> Exp -> Relations a
 updRels rs (App (C Eql) (T[e1,e2])) = updRelsEq rs e1 e2
 updRels rs e = upd ixsEqv' (upd ixsEqv rs e) e
-upd ixsEqv (aux,eqs,hg) (App (C c) (T es)) = [(c,is)] |=>* (aux,eqs',hg)
+upd ixsEqv (aux,eqs,hg) (App (C c) (T es)) = [(PW c,is)] |=>* (aux,eqs',hg)
   where (is,eqs') = ixsEqv es eqs
 upd _ rs _ = rs
 
+updRelsTrue :: Relations a -> Exp -> Relations a
 updRelsTrue rs e = rs''
   where rs'' = updRels rs' (bOp Eql (resetVar e) (C(B True)))
         rs' = updRels rs (bOp Eql e (C(B True)))
 
-updRelsEq (aux,eqs,hg) e0 e = [(Eql,[i,i'])] |=>* (aux,mergeEC i i' eqs',relabelHG hg i i')
+updRelsEq :: Relations a -> Exp -> Exp -> Relations a
+updRelsEq (aux,eqs,hg) e0 e = [(PW Eql,[i,i'])] |=>* (aux,mergeEC i i' eqs',relabelHG hg i i')
   where ([i,i'],eqs') = ixsEqv' [e0',e'] eqs
         (e0',e') = (resetVar e0, resetVar e)
 
 -- This checks the structure for a particular relation instance.
 -- This currently takes linear time, this should be much faster.
+chkRels :: Relations a -> Exp -> Bool
 chkRels _ (C (B True)) = True
 chkRels (aux,eqs,_ ) (App (C Eql) (T [e1,e2])) = eqChkZ 1 eqs (resetVar e1) (resetVar e2)
-chkRels (aux,eqs,rs) (App (C c) (T es)) = (c,is) `edgeHG` rs
+chkRels (aux,eqs,rs) (App (C c) (T es)) = (PW c,is) `edgeHG` rs
   where (is,_) = ixsEqv es eqs
-chkRels (aux,eqs,rs) (App (C c) e) = (c,is) `edgeHG` rs
+chkRels (aux,eqs,rs) (App (C c) e) = (PW c,is) `edgeHG` rs
   where (is,_) = ixsEqv [e] eqs
 chkRels _ _ = False
 
+chkRels' :: Relations a -> Exp -> Bool
 chkRels' _ (C (B True)) = True
 chkRels' (aux,eqs,_ ) (App (C Eql) (T [e1,e2])) = eqChkZ 1 eqs (resetVar e1) (resetVar e2)
-chkRels' (aux,eqs,rs) (App (C c) (T es)) = (c,is) `edgeHG` rs
+chkRels' (aux,eqs,rs) (App (C c) (T es)) = (PW c,is) `edgeHG` rs
   where (is,_) = ixsEqv es eqs
 chkRels' (_,eqs,_rs) e = i == j
   where ([i,j],_) = ixsEqv [e,C(B True)] eqs
@@ -79,20 +89,25 @@ eqChkZ 0 er e1 e2 = eqChk (\e1-> \e2-> (chkEquality er e1 e2) || (e1==e2)) e1 e2
 eqChkZ n er e1 e2 = eqChk (\e1-> \e2-> (eqChkZ (n-1) er e1 e2)) e1 e2
 
 -- Reporting on expressions.
-reportRels es (_,eqs,rs) = [(App (C p) (T (map (conv eis) is))) | (p,is) <- l'']
+reportRels :: [Exp] -> Relations a -> [Exp]
+reportRels es (_,eqs,rs) = [(App (C p) (T (map (conv eis) is))) | (PW p,is) <- l'']
   where l'' = reportHG (\is' -> is' `subset` is) rs
         (is,_) = ixsEqv es eqs
         eis = zip es is
         conv ((e,i):eis) i' = if i==i' then e else conv eis i'
         conv _ _ = C C_None
 
-closureRels (aux,eqs,hg) = (aux,eqs',hg') where (eqs',hg') = closureHG' Eql (eqs,hg)
+closureRels :: Relations a -> Relations a
+closureRels (aux,eqs,hg) = (aux,eqs',hg') where (eqs',hg') = closureHG' (PW Eql) (eqs,hg)
 
 ----------------------------------------------------------------
 -- Internal support functions.
 
-(|=>) nrs (a,e,r) = (a,e,putsHG r nrs)
-(|=>*) (nrs@[(Eql,[i,j])]) (a,e,r) = 
+(|=>) :: (Eq b, Ord a) => [Edge a b] -> (c,Equivalence Exp b,Hypergraph a b) -> (c,Equivalence Exp b,Hypergraph a b)
+(|=>) nrs (a,e,r) = (a, e, putsHG r nrs)
+
+(|=>*) :: [Edge PredWrap Index] -> (a,Equivalence Exp Index,Hypergraph PredWrap Index) -> (a,Equivalence Exp Index,Hypergraph PredWrap Index)
+(|=>*) (nrs@[(PW Eql,[i,j])]) (a,e,r) = 
   closureRels $ nrs |=> (a, mergeEC i j e, resetMarksHG r)
 (|=>*) nrs (a,e,r) = closureRels $ nrs |=> (a, e, resetMarksHG r)
 
@@ -106,7 +121,12 @@ closureHG' eqC (eqs, (hg@(ls,_))) =
        hg' = putsHG (resetMarksHG hg) newEdges
        eqM [i1,i2] (eqs,hg) = (mergeEC i1 i2 eqs, relabelHG hg i1 i2) 
        (eqs'',g'') = foldr eqM (eqs,hg') (map snd $ getHG hg' eqC) 
-   in (if hasMarkedHG g'' then closureHG' eqC else id) (eqs'',g'')
+
+       r_sz = hgSize g''
+       (e_sz, q_sz) = eqvSize eqs''
+       sz_ok = (r_sz < e_sz)
+
+   in (if True && hasMarkedHG g'' then closureHG' eqC else id) (eqs'',g'')
 
 ----------------------------------------------------------------
 -- Consideration with respect to relation context.
@@ -116,10 +136,10 @@ considRels (e0@(App (C (NLPredLC _)) (T es))) (aux,eqs,rs) =
   in foldr considRels' (aux,eqs',rs) es
 
 considRels (e0@(App (C c) (T es))) (aux,eqs,rs) =
-  if c `elem` [Or,Pow,Plus,Minus,Times,Div,Mod,Union,Isect,Cart,Arrow,SetExplicit,GCF,LCM] then
+  if c `elem` [Or,Pow,Plus,Minus,Times,Div,Mod,Otimes,Oplus,Union,Isect,Cart,Arrow,SetExplicit,GCF,LCM] then
     let (i1:is, eqs') = ixsEqv ([e0]++es) eqs
-        ls = if c==SetExplicit then [(In, [j,i1]) | j <- is] else []
-        rs' = (ls++[(SLC Eql c, i1:is)]) |=> (aux,eqs', rs)
+        ls = if c==SetExplicit then [(PW In, [j,i1]) | j <- is] else []
+        rs' = (ls++[(PW $ SLC Eql c, i1:is)]) |=> (aux,eqs', rs)
     in rs'
   else
     (aux,eqs,rs)
@@ -127,24 +147,24 @@ considRels (e0@(App (C c) (T es))) (aux,eqs,rs) =
 considRels (e0@(App (C c) e)) (aux,eqs,rs) =
   if c `elem` [Neg,Ran,Dom,Max,Min,Ln,Log] then
     let ([i1,i2], eqs') = ixsEqv [e0,e] eqs
-    in [(SLC Eql c, [i1,i2])] |=> (aux,eqs', rs)
+    in [(PW $ SLC Eql c, [i1,i2])] |=> (aux,eqs', rs)
   else
     (aux,eqs,rs)
 
 considRels (e0@(App e1 e2)) (aux,eqs,rs) =
   let ([i0,i1,i2], eqs') = ixsEqv [e0,e1,e2] eqs
-  in [(SLC Eql Apply, [i0,i1,i2])] |=> (aux,eqs', rs)
+  in [(PW $ SLC Eql Apply, [i0,i1,i2])] |=> (aux,eqs', rs)
 
 considRels (e0@(T es)) (aux,eqs,rs) =
   let (i:js, eqs') = ixsEqv ((T es):es) eqs
-  in ([(SLC Eql Tuple, i:js)]) |=> (aux,eqs',rs)
+  in ([(PW $ SLC Eql Tuple, i:js)]) |=> (aux,eqs',rs)
 
 considRels _ rs = rs
 
 considRels' (T es) (aux,eqs,rs) =
   let (i:js, eqs') = ixsEqv ((T es):es) eqs
-      ls = [(NLPredLC [Nothing, Just "is", Just "a", Just "component", Just "of", Nothing], [j,i]) | j <- js]
-  in (ls++[(SLC Eql Tuple, i:js)]) |=> (aux,eqs',rs)
+      ls = [(PW $ NLPredLC [Nothing, Just "is", Just "a", Just "component", Just "of", Nothing], [j,i]) | j <- js]
+  in (ls++[(PW $ SLC Eql Tuple, i:js)]) |=> (aux,eqs',rs)
 considRels' _ rs = rs
 
 ----------------------------------------------------------------
@@ -153,7 +173,7 @@ considRels' _ rs = rs
 addRelLaw (aux,eqs,rs) e = 
   let cs = map C $ getAxCs e
       (is,eqs') = ixsEqv cs eqs
-  in (aux, eqs', foldl addLawHG rs (convert (zip cs is) e))
+  in (aux, eqs', foldl addLawHG rs (convertPW (zip cs is) e))
 
 getAxCs :: Exp -> [Const]
 getAxCs (Forall ns (App (C Imp) (T[_,(App (C cl) (T [e1,e2]))]))) =
@@ -188,6 +208,12 @@ convExps ixs n old new (e:es) = case (convExp ixs n e) of
   Nothing -> Nothing
   Just (n',eo,ens) -> convExps ixs n' (eo:old) (ens++new) es
 convExps ixs n old new [] = Just (n,reverse old,reverse new)
+
+convertPW :: [(Exp, Index)] -> Exp -> [([(PredWrap, [Index])], [(PredWrap, [Index])])]
+convertPW cns e = map f l
+  where l = convert cns e
+        f = (\(x,y) -> (map g x,map g y))
+        g = (\(x,y) -> (PW x, y))
 
 convert :: [(Exp, Index)] -> Exp -> [([(Const, [Index])], [(Const, [Index])])]
 convert cns (Forall ns (App (C Imp) (T[e00,(App (C c) (T [e1,e2]))]))) =

@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -28,8 +28,8 @@ import ValidationComp (Verification(..))
 -- Process a list of statements while maintaining a context,
 -- and validate expressions with respect to this context.
 
-validateSyntaxVars :: [Stmt] -> ([Stmt], Stat)
-validateSyntaxVars ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 []) ss
+validateSyntaxVars :: Context -> [Stmt] -> ([Stmt], Stat)
+validateSyntaxVars _ ss = (\(ss,(_,_,_,st))->(ss,st)) $ execs (setBasic $ state0 []) ss
 
 exec :: Context -> Stmt -> ([Stmt], Context)
 exec state (s@(Text _)) = ([s], state)

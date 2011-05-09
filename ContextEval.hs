@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -10,11 +10,13 @@
 -- ContextEval.hs
 --   Simple evaluation rules (i.e. a calculator) for simple
 --   expressions consisting mostly of constants.
+--   Meta-propositions about the literal structure of
+--   expressions.
 
 ----------------------------------------------------------------
 -- 
 
-module ContextEval where
+module ContextEval (considEval, considLit) where
 
 import Ratio
 import Data.Maybe (catMaybes)
@@ -30,6 +32,19 @@ import ContextRelations
 -- the context.
 
 considEval e rs = maybe rs (updRelsEq rs e) $ evalConst e
+
+----------------------------------------------------------------
+-- Predicates that automatically apply to constants.
+
+considLit e rs = case e of
+  C (N i) ->
+    if denominator i == 1 && numerator i >= 0 then
+      updRels rs (bOp In e (C (SetN)))
+    else if denominator i == 1 then
+      updRels rs (bOp In e (C (SetZ)))
+    else 
+      updRels rs (bOp In e (C (SetQ)))
+  _ -> rs
 
 ----------------------------------------------------------------
 -- Synonyms for functions to manipulate rationals.

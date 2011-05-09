@@ -2,7 +2,7 @@
 --
 -- Aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -24,7 +24,7 @@ module IOPrintFormat where
 type OutputFormat = [String -> String]
 
 noneOutFmt :: OutputFormat
-noneOutFmt = [id,id,id,id,id,id]
+noneOutFmt = [id,id,id,id,id,id,id]
 
 ansiOutFmt :: OutputFormat
 ansiOutFmt =
@@ -32,7 +32,8 @@ ansiOutFmt =
   , id
   , \s-> "\ESC[32m"++s
   , \s-> s++"\ESC[0m"
-  , \s-> "\ESC[36m"++s++"\ESC[0m"
+  , \s-> "\ESC[36m"++s++"\ESC[0m" --invalid
+  , \s-> "\ESC[36m"++s++"\ESC[0m" --contradiction
   , \s-> "\ESC[31m"++s++"\ESC[0m"
   ]
 
@@ -65,15 +66,19 @@ htmlOutFmt =
   , \s-> "<font color=\"#B0C4DE\">"++s --lightsteelblue
   , \s-> s++"</font>"
   , \s-> "<font color=\"#6495ED\">"++s++"</font>" --cornflowerblue
-  , \s-> "<font color=\"#B22222\"><b>"++s++"</b></font>" -- firebrick,#C82626
+  , \s-> "<font color=\"#EAC100\"><b>"++s++"</b></font>" -- invalid (firebrick,#C82626)
+  , \s-> "<font color=\"#B22222\"><b>"++s++"</b></font>" -- contradiction
+  , \s-> "<font color=\"#E46D00\"><b><i>"++s++"</i></b></font>"
   ]
 
-fmt [ou,_,_,_,_,_] "output" s = ou s
-fmt [_,sp,_,_,_,_] "string" s = sp s
-fmt [_,_,li,_,_,_] "ignore-left" s = li s
-fmt [_,_,_,ri,_,_] "ignore-right" s = ri s
-fmt [_,_,li,ri,_,_] "ignore" s = li (ri s)
-fmt [_,_,_,_,va,_] "valid" s = va s
-fmt [_,_,_,_,_,inv] "invalid" s = inv s
+fmt [ou,_,_,_,_,_,_,_] "output" s = ou s
+fmt [_,sp,_,_,_,_,_,_] "string" s = sp s
+fmt [_,_,li,_,_,_,_,_] "ignore-left" s = li s
+fmt [_,_,_,ri,_,_,_,_] "ignore-right" s = ri s
+fmt [_,_,li,ri,_,_,_,_] "ignore" s = li (ri s)
+fmt [_,_,_,_,va,_,_,_] "valid" s = va s
+fmt [_,_,_,_,_,inv,_,_] "invalid" s = inv s
+fmt [_,_,_,_,_,_,cntr,_] "contradiction" s = cntr s
+fmt [_,_,_,_,_,_,_,syn] "invalidsyntax" s = syn s
 
 --eof

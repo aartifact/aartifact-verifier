@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -87,8 +87,17 @@ assertKeys = ["Assert", "Assert that"]
 considerKeys = ["Consider"]
 
 stmtOrErrP = stmtP <?|> 
-  do{ src <- getSrc; pos <- getPos; many1 anyChar
-    ; return [SyntaxError $ srcTxtFrom src pos]}
+  do{ src <- getSrc
+    ; pos <- getPos
+    ; anyChar
+    ; pos2 <- getPos
+    ; ss <- many stmtOrErrP
+    ; errTxt <- return $ srcTxt src pos pos2
+    ; return $ 
+      case concat ss of
+        (SyntaxError t):ss -> [SyntaxError $ errTxt++t] ++ ss
+        ss -> [SyntaxError $ errTxt] ++ ss
+    }
 
 stmtP :: Parse [Stmt]
 stmtP = introP 
@@ -192,6 +201,7 @@ expAtom =
  <|> try (bracks "||" "||" VectorNorm expP)
  <|> try (bracks "|" "|" (Brack Bar Bar) expP)
  <|> expFracP
+ <|> (try expProbP <|> expProbWithCondP)
  <|> expIntervalP
  <|> bracks "\\lceil" "\\rceil" Ceil expP
  <|> bracks "\\lfloor" "\\rfloor" Floor expP
@@ -309,6 +319,28 @@ setEnumP =
     ; return $ bOp SetEnum e1 e2
     }
     <?> "set (enumeration)"
+
+expProbWithCondP :: Parse Exp
+expProbWithCondP =
+  do{ reserved "\\Pr"
+    ; (reservedOp "(" <|> reservedOp "[")
+    ; e1 <- expP
+    ; reservedOp "|"
+    ; e2 <- expP
+    ; (reservedOp ")" <|> reservedOp "]")
+    ; return $ App (C Probability) (T [e1,e2])
+    }
+    <?> "probability expression (with conditions)"
+
+expProbP :: Parse Exp
+expProbP =
+  do{ reserved "\\Pr"
+    ; (reservedOp "(" <|> reservedOp "[")
+    ; e <- expP
+    ; (reservedOp ")" <|> reservedOp "]")
+    ; return $ App (C Probability) e
+    }
+    <?> "probability expression (without conditions)"
 
 setCompP :: Parse Exp
 setCompP =
@@ -441,6 +473,7 @@ phraseNoAndP =
  <|> phraseInContextForall
  <|> phraseIfThen
  <|> phraseNot
+ <|> phraseContradiction
  <|> bracksIgnP "{" "}" (phraseP)  --(phraseIsP <?|> phraseP)
  <|> bracksIgnP "(" ")" (phraseP)  -- (wStr $ parens phraseP)
  <|> phrasePreds
@@ -451,6 +484,7 @@ phraseNoAndP =
 phrasePreds = 
      phrasePred "\\p" NLPredC
  <|> phrasePred "\\l" NLPredLC
+ <|> phrasePredBrack NLPredLC
 
 phraseForall = phraseQ (keysP forallKeys) (do{commaP;return ""}) Forall Imp
   <?> "universal quantification (English)"
@@ -517,6 +551,14 @@ phraseNot =
     }
     <?> "logical negation (English)"
 
+phraseContradiction =
+  do{ s <- getSrc
+    ; p1 <- getPos
+    ; keysP ["contradiction"]
+    ; p2 <- getPos
+    ; return $ (C Contradiction, Src $ srcTxt s p1 p2, (p1,p2))
+    } <?> "contradiction"
+
 phraseMathP :: Parse (Exp, Src, (SourcePos, SourcePos))
 phraseMathP =
   do{ s <- getSrc
@@ -531,6 +573,15 @@ phrasePred flagStr con =
     ; p1 <- getPos
     ; reserved flagStr
     ; ews <- braces (many1 (phrasePredSubExp <|> phrasePredWord'' <|> phrasePredWordIs <|> phrasePredSubPred))
+    ; p2 <- getPos
+    ; return $ (mkNLPred con ews, Src $ srcTxt s p1 p2, (p1,p2))
+    }
+    <?> "predicate expression (English)"
+
+phrasePredBrack con =
+  do{ s <- getSrc
+    ; p1 <- getPos
+    ; ews <- brackets (many1 (phrasePredSubExp <|> phrasePredWord'' <|> phrasePredWordIs <|> phrasePredSubPred))
     ; p2 <- getPos
     ; return $ (mkNLPred con ews, Src $ srcTxt s p1 p2, (p1,p2))
     }
@@ -574,7 +625,8 @@ phraseMakeReport =
     ; symb "?"
     ; es <- sepBy expNoCommaP commaSep
     ; symb "?"
-    ; pos2 <- getPos  
+    ; pos2 <- getPos
+    ; many1 anyChar
     ; return $ (App (C MakeReport) (T es), Src $ srcTxt s pos1 pos2, (pos1,pos2))
     }
 
@@ -636,6 +688,7 @@ bracks l r c p =
 
 brackP str ret = do{symb str; return ret}<?> "bracket"
 braces p       = between (symb "{") (symb "}") p
+brackets p       = between (symb "[") (symb "]") p
 parens0 p      = between (symb "(") (symb ")") p
 dollarsigns p  = between (symb "$") (symb "$") p
 mathpounds p  = between (symb "#") (symb "#") p
@@ -696,7 +749,8 @@ langDef
       ["\\interval"]++
       ["\\forall", "\\exists", "\\if", "\\then", "\\else", "\\sqrt",
        "\\frac",
-       "\\nofix", "\\p", "\\l",
+       "\\Pr",
+       "\\nofix", "\\p", "\\l", "\\q",
        ".", "\\\\", "|", "\\[", "\\]", 
        "\\{", "\\}", "\\langle", "\\rangle",
        "\\lfloor", "\\rfloor", "\\lceil", "\\rceil",

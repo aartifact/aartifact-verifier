@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -15,7 +15,7 @@
 ----------------------------------------------------------------
 -- 
 
-module Validation (rawcxt, validate) where
+module Validation (rawCxt, validate, validateBasic) where
 
 import IOPrintFormat
 import IOSource
@@ -29,12 +29,10 @@ import ValidationSearch (verify)
 -- Process a list of statements while maintaining a context,
 -- and validate expressions with respect to this context.
 
---validate :: [Stmt] -> [Stmt] -> ([Stmt], Stat)
---validate ont ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 ont') ss
---  where ont' = concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
-
-validate cxtraw ss = (\(ss,(_,_,st))->(ss,st)) $ execs cxtraw ss
-rawcxt ont = state0 $ concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
+validate :: Context -> [Stmt] -> ([Stmt], Stat)
+validate cxtraw ss = (\(ss,(_,_,_,st))->(ss,st)) $ execs cxtraw ss
+validateBasic cxtraw ss = (\(ss,(_,_,_,st))->(ss,st)) $ execs (setBasic cxtraw) ss
+rawCxt stmts = state0 $ concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) stmts
 
 exec :: Context -> Stmt -> ([Stmt], Context)
 exec state (s@(Text _)) = ([s], state)
@@ -46,8 +44,12 @@ exec state (ExpStmt Assert (e,src)) = ([ExpStmt Assert (e',src')], state'')
         stat' = statSrc src'
         src' = vArt state' e' src
         (e',state') = freshExpVars (normOps e) state
-exec state (ExpStmt si (e,src)) = ([ExpStmt si (e',src')], state'')
+exec state (ExpStmt Assume (e,src)) = ([ExpStmt Assume (e',src')], state'')
   where state'' = if isErr src' then considerCxt e' state' else assumeCxt e' state'
+        src' = vAsu state' e' src
+        (e',state') = freshExpVars (normOps e) state
+exec state (ExpStmt Consider (e,src)) = ([ExpStmt Consider (e',src')], state'')
+  where state'' = if isErr src' then state' else addLawCxt state' e
         src' = vAsu state' e' src
         (e',state') = freshExpVars (normOps e) state
 exec state (Include n ss) = (map (mkIncludeWrap n) rs, state')
@@ -92,9 +94,16 @@ vArt s (App (C MakeReport) (T es)) src = SrcReport (reportCxt es (considerCxt (T
 vArt s e src = 
   let fvs = fv (varsCxt s) e
   in if length fvs > 0 then SrcErr src (ErrUnbound (map fst fvs)) else
-     case verify s e of
-       Verifiable (B True) -> SrcStat (statCxt s) $ SrcOk src --([R str $ Verifiable s (B True)], assumeCxt e state')
-       r                   -> SrcStat (statCxt s) $ SrcErr src (ErrVer "") --([R (str) r], state')
+     case verify_or_contra s e of
+       Verifiable Contradiction -> SrcStat (statCxt s) $ SrcErr src (ErrContra)
+       Verifiable (B True)      -> SrcStat (statCxt s) $ SrcOk src --([R str $ Verifiable s (B True)], assumeCxt e state')
+       r                        -> SrcStat (statCxt s) $ SrcErr src (ErrVer "") --([R (str) r], state')
+
+verify_or_contra s e =
+  case verify (assumeCxt e s) (C Contradiction) of
+    Verifiable (B True) -> Verifiable Contradiction
+    _                   -> verify s e
+    
 
 -- ++":"++(show (evalExp state e)) -- ++ show (getR state)
 -- eof

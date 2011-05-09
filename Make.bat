@@ -2,7 +2,7 @@
 ::
 :: aartifact
 :: http://www.aartifact.org/src/
-:: Copyright (C) 2008-2010
+:: Copyright (C) 2008-2011
 :: A. Lapets
 ::
 :: This software is made available under the GNU GPLv3.
@@ -19,6 +19,6 @@
 @IF EXIST hi GOTO make
 @MD hi
 :make
-ghc -O2 --make -odir o -hidir hi Main -o aa.exe
+ghc -O2 --make -fspec-constr-count=50 -odir o -hidir hi Main -o aa.exe
 
 ::eof

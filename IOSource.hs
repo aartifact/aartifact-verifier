@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -64,7 +64,7 @@ srcTxt s p1 p2 =
 -- for tags and annotations that can correspond to errors or
 -- verification results.
 
-data Err = ErrUnbound [String] | ErrVer String
+data Err = ErrUnbound [String] | ErrVer String | ErrContra
 data Src =
     Src String
   | SrcStat Stat Src
@@ -77,6 +77,7 @@ data Src =
 showWithErr oFmt err s = case err of
   ErrUnbound _ -> fmt oFmt "invalid" s
   ErrVer es -> fmt oFmt "invalid" s
+  ErrContra -> fmt oFmt "contradiction" s
 
 showSrc oFmt src = case src of
   Src s -> fmt oFmt "string" s
@@ -138,7 +139,7 @@ showStmt oFmt r = case r of
   ExpStmt _ (_,src) -> showSrc oFmt src
   IncludeWrap n r  -> "Included dependency processed."     --fmt html "green" $ "In [["++n++"]]: "
   SystemError s -> "\n *** System error *** : " ++ s
-  SyntaxError s -> fmt oFmt "invalid" $ "\n\n *** Syntax error in statement immediately below *** : \n\n" ++ s
+  SyntaxError s -> fmt oFmt "invalidsyntax" $ s --"\n\n *** Syntax error in statement immediately below *** : \n\n" ++
 
 showStmts :: OutputFormat -> [Stmt] -> String
 showStmts oFmt rs = case getReportStmts rs of

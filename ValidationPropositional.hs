@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -15,7 +15,7 @@
 ----------------------------------------------------------------
 -- 
 
-module ValidationPropositional (validatePropositional, propOnt) where
+module ValidationPropositional (validatePropositional) where
 
 import Data.Maybe (catMaybes)
 
@@ -30,47 +30,11 @@ import ContextEval
 import ValidationComp
 
 ----------------------------------------------------------------
--- Ontology for propositional logic.
-
-propOnt =
-   "\\vbeg"
- ++"Assume considering $P \\Rightarrow Q$, \\l{$P \\Rightarrow Q$ is the implication from $P$ to $Q$}."
- ++"Assume for any $P,Q,R$, \\l{$R$ is the implication from $P$ to $Q$} and \\l{$R$ is true} implies that \\l{$P$ does imply $Q$}."
- ++"Assume for any $P,Q,R$, \\l{$P$ does imply $Q$} and \\l{$Q$ does imply $R$} implies that \\l{$P$ does imply $R$}."
- ++"Assume for any $P,Q,R$, \\l{$R$ is the implication from $P$ to $Q$} and \\l{$P$ does imply $Q$} implies that \\l{$R$ is true}."
- ++"Assume for any $P,Q$, \\l{$P$ does imply $Q$} and \\l{$P$ is true} implies that \\l{$Q$ is true}."
-  
- ++"Assume considering $P \\wedge Q$, \\l{$P \\wedge Q$ is the conjunction of $P$ and $Q$}."
- ++"Assume for any $P,Q,R$, \\l{$R$ is the conjunction of $P$ and $Q$}, \\l{$P$ is true}, and \\l{$Q$ is true} implies that \\l{$R$ is true}."
- ++"Assume for any $P,Q,R$, \\l{$R$ is the conjunction of $P$ and $Q$} and \\l{$R$ is true} implies that \\l{$P$ is true} and \\l{$Q$ is true}."
-  
- ++"Assume considering $P \\vee Q$, \\l{$P \\vee Q$ is the disjunction of $P$ and $Q$}."
- ++"Assume for any $P,Q,R$, \\l{$R$ is the disjunction of $P$ and $Q$} and \\l{$P$ is true} implies that \\l{$R$ is true}."
- ++"Assume for any $P,Q,R$, \\l{$R$ is the disjunction of $P$ and $Q$} and \\l{$Q$ is true} implies that \\l{$R$ is true}."
-
- ++"Assume for any $P,Q$, if \\l{$P$ is false} and \\l{$Q$ is the negation of $P$} then \\l{$Q$ is true}."
- ++"Assume for any $P,Q$, if \\l{$P$ is true} and \\l{$Q$ is the negation of $P$} then \\l{$Q$ is false}."
- ++"Assume for any $P,Q$, if \\l{$Q$ is the negation of $P$} then \\l{$P$ is the negation of $Q$}."
- ++"Assume considering $\\neg P$, \\l{$\\neg P$ is the negation of $P$}."
-
- ++"Assume for any $P,Q,R$, \\l{$P$ does imply $Q$}, \\l{$P$ does imply $R$}, \\l{$R$ is the negation of $Q$} implies \\l{$P$ is false}."
-
- ++"Assume for any $P,Q,R,S$, \\l{$P$ does imply $S$}, \\l{$Q$ does imply $S$}, \\l{$R$ is the disjunction of $P$ and $Q$} implies \\l{$R$ does imply $S$}."
- ++"\\vend"
-
-assertCxt' s e = assertCxt s e || assertCxt s (App (C (NLPredLC [Nothing,Just "is",Just "true"])) (T[e]))
-assumeCxt' e s = assumeCxt (App (C (NLPredLC [Nothing,Just "is",Just "true"])) (T[e])) s --(assumeCxt e s) 
-
-----------------------------------------------------------------
 -- Process a list of statements while maintaining a context,
 -- and validate expressions with respect to this context.
 
-validatePropositional :: [Stmt] -> [Stmt] -> ([Stmt], Stat)
-validatePropositional ont ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 ont') ss
-  where ont' = concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
-
-validatePropositional' cxtraw ss = (\(ss,(_,_,st))->(ss,st)) $ execs (state0 []) ss
-rawcxt ont = state0 $ concat $ map (\x->case x of ExpStmt _ (e,_)->[e];_->[]) ont
+validatePropositional :: Context -> [Stmt] -> ([Stmt], Stat)
+validatePropositional ont ss = (\(ss,(_,_,_,st))->(ss,st)) $ execs ont ss
 
 exec :: Context -> Stmt -> ([Stmt], Context)
 exec state (s@(Text _)) = ([s], state)
@@ -103,9 +67,13 @@ execs state (s:ss) = (vs++vs', state'') where
 -- Analysis and verification of expressions with feedback in the
 -- form of source annotations/tags.
 
+assertCxt' s e = assertCxt s e || assertCxt s (App (C (NLPredLC [Nothing,Just "is",Just "true"])) (T[e]))
+assumeCxt' e s = assumeCxt (App (C (NLPredLC [Nothing,Just "is",Just "true"])) (T[e])) s --(assumeCxt e s) 
+
 vAsu :: Context -> Exp -> Src -> Src
 vAsu s e (SrcIg [l,src,r]) = SrcIg [l,vAsu s e src,r]
 vAsu s (App (C (NLPredC _)) (T [])) src = SrcOk src
+vAsu s (App (C (NLPredLC _)) (T [])) src = SrcOk src
 vAsu s (App (C Imp) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vAsu s e1 s1, vAsu s e2 s2]
 vAsu s (App (C Iff) (T[e1,e2])) (SrcL ts [s1,s2]) = SrcL ts [vAsu s e1 s1, vAsu s e2 s2]
 vAsu s (App (C Not) e)          (SrcL ts [src]) = SrcL ts [vAsu s e src]

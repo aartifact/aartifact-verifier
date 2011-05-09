@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -40,7 +40,7 @@ data Const =
   | NotC Const
 
   | Pow | Log | Ln | EulerE
-  | Neg | Times | Div | Plus | Minus 
+  | Neg | Times | Div | Plus | Minus | Oplus | Otimes
   | Mod | GCF | LCM
   | Max | Min | Floor | Ceil
   | Subscript | Circ
@@ -48,16 +48,20 @@ data Const =
   | IntervalOO | IntervalOC | IntervalCO | IntervalCC
   | Eql | Neq | Lt | Lte | Gt | Gte | Cong
   | In | Union | Isect | Cart | Arrow | Ran | Dom
+  | Kernel | Image | Span | Dim
   | Subset | Subseteq | Subsetneq
   | And | Or | Not | Imp | Iff | IfThenElse
   | B Bool | N Rational | SetZ | SetN | SetQ | SetR | Ast
   | SetComp | SetExplicit | SetEnum | Set [Const] | PowerSet
+  | Probability
 
   | NLPredC [Maybe String] | NLPredLC [Maybe String]
 
   | TC [Const] | Kleene [Const]
   | Brack Bracket Bracket
   | Infinity
+  
+  | Contradiction
   deriving (Show,Eq,Ord)
 
 ----------------------------------------------------------------
@@ -84,6 +88,10 @@ constStrPairs = map (\p->(p,None))
   , (SetR, "\\R")
   , (Dom, "\\dom")
   , (Ran, "\\ran")
+  , (Kernel, "\\ker")
+  , (Image, "\\im")
+  , (Span, "\\span")
+  , (Dim, "\\dim")
   , (Infinity, "\\infty")
   , (Log, "\\log")
   , (GCF, "\\gcf")
@@ -116,7 +124,11 @@ opsArith  =
   ]
 opsSet  =
   --[[((Cart,  "\\times"), InL)]] --implemented in parser
-  [ [ ((Isect, "\\cap"), InL)
+  [ [ ((Otimes, "\\otimes"), InL)
+    ],
+    [ ((Oplus, "\\oplus"), InL)
+    ],
+    [ ((Isect, "\\cap"), InL)
     , ((Union, "\\cup"), InL)
     ]
   , [ ((Arrow, "\\rightarrow"), InR)
