@@ -2,7 +2,7 @@
 --
 -- aartifact
 -- http://www.aartifact.org/src/
--- Copyright (C) 2008-2010
+-- Copyright (C) 2008-2011
 -- A. Lapets
 --
 -- This software is made available under the GNU GPLv3.
@@ -19,17 +19,17 @@ module Main (main) where
 import System.IO
 import System.Environment (getArgs)
 import System.Time (getClockTime,diffClockTimes,tdSec,tdPicosec)
+import Directory (getDirectoryContents, doesFileExist)
 
 import IOParser (parseP, program, stdAloneExp)
 import IOSource
 import IOPrintFormat
 import ExpSQL (expSql)
-import Validation (rawcxt, validate)
-import ValidationPropositional (validatePropositional, propOnt)
+import Validation (rawCxt, validate, validateBasic)
+import ValidationPropositional (validatePropositional)
 import ValidationSyntaxVars (validateSyntaxVars)
 import Context (shStats)
-import ContextOntology (ont)
-import ContextRaw (cxtraw)
+import ContextRaw (compiledSysList, rawsys)
 
 ----------------------------------------------------------------
 -- The target of the output, as specified by the command-line
@@ -40,18 +40,28 @@ data OutputTarget = CmdLine | File String
 ----------------------------------------------------------------
 -- The logical system of the validation procedure to deploy.
 
-data LogicalSystem = 
-    FullContext
-  | Propositional
-  | SyntaxVars
+type System = String
+type Procedure = String
 
 ----------------------------------------------------------------
 -- Takes a file path in the form of a string, try to parse the
 -- file into an abstract syntax, and run it.
 
+rmvEnt = let r l = case l of '%':' ':'1':xs->r xs; x:xs->x:r xs; []->[] in r
+commaSep l = foldr (\x y -> x++", "++y) (last l) (init l)
+
 showTD td = "(completed in "++
   (show$floor(((toRational$tdSec td)*(toRational$10^12)+
     (toRational$tdPicosec td))/10^9))++"ms)\n"
+
+readFiles :: [String] -> IO [[Stmt]]
+readFiles [] = do { return [] }
+readFiles (f:fs) =
+  do { syss <- readFiles fs
+     ; sysStr <- readFile $ "systems/" ++ f
+     ; sys <- parseP program f sysStr  
+     ; return $ sys:syss
+     }
 
 processSql :: String -> IO ()
 processSql str =
@@ -63,99 +73,79 @@ processSql str =
 
 processRawCx :: IO ()
 processRawCx =
-  do { ont <- readFile "ontology"
-     ; ont <- parseP program "<ontology>" ont
+  do { fs <- getDirectoryContents "./systems"
+     ; fs <- return $ filter (\f -> not $ (f==".") || (f=="..")) fs     
+     ; syss <- readFiles fs
+     ; syssStrs <- return $ map (rmvEnt.show.rawCxt) syss
+     ; fSyssStrs <- return $ map (\(f,s)->"\nrawsys \""++f++"\" = "++s) $ zip fs syssStrs
+     ; allStr <- return $ foldr (++) [] fSyssStrs
      ; writeFile "ContextRaw.hs" $ 
-       "module ContextRaw where\nimport ExpConst\nimport Exp\nimport ContextAux\nimport MapUsingRBTree\ncxtraw="
-       ++((let r l = case l of '%':' ':'1':xs->r xs; x:xs->x:r xs; []->[] in r) $ show (rawcxt ont))
+       "module ContextRaw where\nimport ExpConst\nimport Exp\nimport ExpPredicate\nimport Context\nimport ContextAux\nimport MapUsingRBTree\n"
+       ++ "compiledSysList = [" ++ commaSep ["\""++f++"\"" | f<-fs] ++ "]\n"
+       ++ allStr
+       ++ "\nrawsys _ = stateEmpty"
      }
 
-process :: OutputFormat -> OutputTarget -> Bool -> String -> String -> IO ()
-process oFmt out stat fname txt =
+clearRawCx :: IO ()
+clearRawCx =
+  do { writeFile "ContextRaw.hs" $ 
+       "module ContextRaw where\nimport ExpConst\nimport Exp\nimport Context\nimport ContextAux\nimport MapUsingRBTree\n"
+       ++ "compiledSysList = []\n"
+       ++ "rawsys _ = stateEmpty"
+     }
+
+processSys :: System -> Procedure -> OutputFormat -> OutputTarget -> Bool -> String -> String -> IO ()
+processSys sys proc oFmt out stat fname txt =
   let (cr,wr) = case out of
         CmdLine -> (putStr "", putStr)
         File outf -> (writeFile outf "", appendFile outf)
   in
-  do { --ont <- readFile "ontology"
-     --; ont <- parseP program "<ontology>" ont
+  do { sysCxt <- getSysCxt sys
      ; t0 <- getClockTime
      ; stmts <- parseP program fname txt
      ; cr
-     ; (ss',stadat) <- return $ validate cxtraw stmts
+     ; (ss',stadat) <- return $ (getValidate proc) sysCxt stmts
      ; wr $ fmt oFmt "output" $ showStmts oFmt $ ss'
      ; t1 <- getClockTime
      ; if stat then 
-         writeFile "stat.dat" $ 
-         --fmt oFmt "output" $ 
-         --fmt oFmt "ignore" $ 
+         writeFile "stat.dat" $ --fmt oFmt "output" $ fmt oFmt "ignore" $ 
          (("\n"++showTD (diffClockTimes t1 t0))++("\n"++shStats stadat))
        else
          return ()
      }
 
-processSyntaxVars :: OutputFormat -> OutputTarget -> Bool -> String -> String -> IO ()
-processSyntaxVars oFmt out stat fname txt =
-  let (cr,wr) = case out of
-        CmdLine -> (putStr "", putStr)
-        File outf -> (writeFile outf "", appendFile outf)
-  in
-  do { t0 <- getClockTime
-     ; stmts <- parseP program fname txt
-     ; cr
-     ; (ss',stadat) <- return $ validateSyntaxVars stmts
-     ; wr $ fmt oFmt "output" $ showStmts oFmt $ ss'
-     ; t1 <- getClockTime
-     ; if stat then 
-         writeFile "stat.dat" $ 
-         --fmt oFmt "output" $ 
-         --fmt oFmt "ignore" $ 
-         (("\n"++showTD (diffClockTimes t1 t0))++("\n"++shStats stadat))
-       else
-         return ()
-     }
+getValidate proc = case proc of
+  "syntaxvars" -> validateSyntaxVars
+  "propositional" -> validatePropositional
+  "basic" -> validateBasic
+  "full" -> validate
+  _ -> validate
 
-processPropositional :: OutputFormat -> OutputTarget -> Bool -> String -> String -> IO ()
-processPropositional oFmt out stat fname txt =
-  let (cr,wr) = case out of
-        CmdLine -> (putStr "", putStr)
-        File outf -> (writeFile outf "", appendFile outf)
-  in
-  do { ont <- parseP program "<ontology>" propOnt
-     ; t0 <- getClockTime
-     ; stmts <- parseP program fname txt
-     ; cr
-     ; (ss',stadat) <- return $ validatePropositional ont stmts
-     ; wr $ fmt oFmt "output" $ showStmts oFmt $ ss'
-     ; t1 <- getClockTime
-     ; if stat then 
-         writeFile "stat.dat" $ 
-         --fmt oFmt "output" $ 
-         --fmt oFmt "ignore" $ 
-         (("\n"++showTD (diffClockTimes t1 t0))++("\n"++shStats stadat))
-       else
-         return ()
-     }
+getSysCxt sys =
+  if sys `elem` compiledSysList then return $ rawsys sys
+  else
+    do { ex <- doesFileExist $ sys
+       ; syStr <- if ex then readFile $ sys else return ""
+       ; syStmts <- parseP program sys syStr
+       ; return $ rawCxt syStmts
+       }
 
-cmd :: LogicalSystem -> OutputFormat -> [Bool] -> OutputTarget -> [String] -> IO ()
-cmd lgsy _    _   out ["-sqlexp", expStr] = processSql expStr
-cmd lgsy oFmt [_,stat,cx]  out ("-lit":args) = cmd lgsy oFmt [True,stat,cx] out args
-cmd lgsy oFmt [lit,_,cx]   out ("-stat":args) = cmd lgsy oFmt [lit,True,cx] out args
-cmd lgsy oFmt [lit,stat,_] out ("-rawcxt":args) = processRawCx
-cmd lgsy _    fls out ("-o":f          :args) = cmd lgsy htmlOutFmt fls (File f) args
-cmd lgsy _    fls out ("-html"         :args) = cmd lgsy htmlOutFmt fls out args
-cmd lgsy _    fls out ("-cmdhtml"      :args) = cmd lgsy cmdHtmlOutFmt fls out args
-cmd lgsy _    fls out ("-ansi"         :args) = cmd lgsy ansiOutFmt fls out args
-cmd lgsy _    fls out ("-propositional":args) = cmd Propositional ansiOutFmt fls out args
-cmd lgsy _    fls out ("-fullcontext"  :args) = cmd FullContext ansiOutFmt fls out args
-cmd lgsy _    fls out ("-syntaxvars"  :args)  = cmd SyntaxVars ansiOutFmt fls out args
-cmd lgsy oFmt [lit,stat,_] out [s] =
-  if lit then process oFmt out stat "" s
-  else case lgsy of
-    FullContext -> do {t<-readFile s; process oFmt out stat s t}
-    Propositional -> do {t<-readFile s; processPropositional oFmt out stat s t}
-    SyntaxVars -> do {t<-readFile s; processSyntaxVars oFmt out stat s t}
- 
-cmd _ _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError 
+cmd :: System -> Procedure -> OutputFormat -> [Bool] -> OutputTarget -> [String] -> IO ()
+cmd _  _  _    _           out ["-sqlexp", expStr] = processSql expStr
+cmd sy pr oFmt [_,stat,cx] out ("-lit":args)   = cmd sy pr oFmt [True,stat,cx] out args
+cmd sy pr oFmt [lit,_,cx]  out ("-stat":args)  = cmd sy pr oFmt [lit,True,cx] out args
+cmd _  _  _    _   out ("-compilesystems":_)   = processRawCx
+cmd _  _  _    _   out ("-compilenosystems":_) = clearRawCx
+cmd sy pr _    fls out ("-o":f       :args)    = cmd sy pr htmlOutFmt fls (File f) args
+cmd sy pr _    fls out ("-html"      :args)    = cmd sy pr htmlOutFmt fls out args
+cmd sy pr _    fls out ("-cmdhtml"   :args)    = cmd sy pr cmdHtmlOutFmt fls out args
+cmd sy pr _    fls out ("-ansi"      :args)    = cmd sy pr ansiOutFmt fls out args
+cmd _  pr oFmt fls out ("-system"    :sy:args) = cmd sy pr oFmt fls out args
+cmd sy _  oFmt fls out ("-procedure" :pr:args) = cmd sy pr oFmt fls out args
+cmd sy pr  oFmt [lit,stat,_] out [s] =
+  if lit then processSys sy pr oFmt out stat "" s
+  else do {t<-readFile s; processSys sy pr oFmt out stat s t}
+cmd _ _ _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError 
                 "usage:\taa [-html|-ansi] \"path/file.ext\"\n\n"
 
 ----------------------------------------------------------------
@@ -164,7 +154,7 @@ cmd _ _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError
 main :: IO ()
 main =
   do{ args <- getArgs
-    ; cmd FullContext noneOutFmt [False,False,False] CmdLine args
+    ; cmd "fullcontext" "full" noneOutFmt [False,False,False] CmdLine args
     }
 
 --eof

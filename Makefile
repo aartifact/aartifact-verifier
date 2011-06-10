@@ -2,7 +2,7 @@
 ##
 ## aartifact
 ## http://www.aartifact.org/src/
-## Copyright (C) 2008-2010
+## Copyright (C) 2008-2011
 ## A. Lapets
 ##
 ## This software is made available under the GNU GPLv3.
@@ -15,7 +15,7 @@
 ##
 
 CC = ghc
-CCFLAGS = -O2 --make -odir o -hidir hi
+CCFLAGS = -O2 --make -fspec-constr-count=50 -odir o -hidir hi
 SRCS = *.hs
 TARGET = Main
 EXECUTABLE = aa
