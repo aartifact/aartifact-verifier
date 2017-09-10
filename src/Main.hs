@@ -16,8 +16,8 @@ module Main (main) where
 
 import System.IO
 import System.Environment (getArgs)
-import System.Time (getClockTime,diffClockTimes,tdSec,tdPicosec)
-import Directory (getDirectoryContents, doesFileExist)
+import Data.Time.Clock
+import System.Directory (getDirectoryContents, doesFileExist)
 
 import IOParser (parseP, program, stdAloneExp)
 import IOSource
@@ -48,9 +48,11 @@ type Procedure = String
 rmvEnt = let r l = case l of '%':' ':'1':xs->r xs; x:xs->x:r xs; []->[] in r
 commaSep l = foldr (\x y -> x++", "++y) (last l) (init l)
 
-showTD td = "(completed in "++
+showTD td = "(completed in ???ms)\n"
+--showTD td = "(completed in "++ (show$floor((toRational$tdSec td)*(toRational$10^12))++"ms)\n"
+{- showTD td = "(completed in "++
   (show$floor(((toRational$tdSec td)*(toRational$10^12)+
-    (toRational$tdPicosec td))/10^9))++"ms)\n"
+    (toRational$tdPicosec td))/10^9))++"ms)\n" -}
 
 readFiles :: [String] -> IO [[Stmt]]
 readFiles [] = do { return [] }
@@ -99,15 +101,15 @@ processSys sys proc oFmt out stat fname txt =
         File outf -> (writeFile outf "", appendFile outf)
   in
   do { sysCxt <- getSysCxt sys
-     ; t0 <- getClockTime
+     ; t0 <- return 0 --getClockTime
      ; stmts <- parseP program fname txt
      ; cr
      ; (ss',stadat) <- return $ (getValidate proc) sysCxt stmts
      ; wr $ fmt oFmt "output" $ showStmts oFmt $ ss'
-     ; t1 <- getClockTime
+     ; t1 <- return 0 --getClockTime
      ; if stat then 
          writeFile "stat.dat" $ --fmt oFmt "output" $ fmt oFmt "ignore" $ 
-         (("\n"++showTD (diffClockTimes t1 t0))++("\n"++shStats stadat))
+         (("\n"++showTD 0{- difference in times -})++("\n"++shStats stadat))
        else
          return ()
      }

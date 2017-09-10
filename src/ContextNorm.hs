@@ -13,7 +13,7 @@
 
 module ContextNorm where
 
-import Ratio
+import Data.Ratio
 import Data.List (sortBy)
 
 import Set

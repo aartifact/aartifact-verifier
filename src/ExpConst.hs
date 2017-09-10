@@ -13,7 +13,7 @@
 
 module ExpConst where
 
-import Ratio
+import Data.Ratio
 
 import Set
 

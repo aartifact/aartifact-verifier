@@ -15,7 +15,7 @@ module ExpPrint where
 
 import Data.Maybe (catMaybes)
 import Data.List (partition, sort, sortBy)
-import Ratio
+import Data.Ratio
 
 import Set
 import ExpConst

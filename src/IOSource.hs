@@ -14,7 +14,9 @@
 
 module IOSource where
 
-import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.ReadPrec
+import Text.ParserCombinators.ReadP
+import Text.Parsec.Pos
 
 import IOPrintFormat
 import Exp

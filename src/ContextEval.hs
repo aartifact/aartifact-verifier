@@ -16,7 +16,7 @@
 
 module ContextEval (considEval, considLit) where
 
-import Ratio
+import Data.Ratio
 import Data.Maybe (catMaybes)
 
 import Set

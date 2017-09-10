@@ -16,7 +16,7 @@ module ExpSQL (expSql)
   where
 
 import Data.List (sortBy)
-import Ratio (numerator, denominator)
+import Data.Ratio (numerator, denominator)
 
 import Set
 import ExpConst

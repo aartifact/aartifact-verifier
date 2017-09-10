@@ -74,8 +74,13 @@ notV r = case r of
   Verifiable (B b) -> Verifiable (B $ not b)
   _ -> Unknown
 
+orV :: [Verification] -> Verification
 orV = foldl (|||) Unknown
+
+orV' :: [Verification] -> Verification
 orV' = foldl (|/|) (Verifiable (B False))
+
+andV :: [Verification] -> Verification
 andV = foldl (&&&) (Verifiable (B True))
 
 boolToV b = if b then Verifiable (B True) else Unknown

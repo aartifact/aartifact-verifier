@@ -134,6 +134,8 @@ matchs' ps ns es es' =
 
 exmch :: [Name] -> Exp -> Exp -> Maybe Subst
 exmch ns e1 e2 = exmch' [] ns e1 e2
+
+exmch' :: [(Name, Name)] -> [Name] -> Exp -> Exp -> Maybe Subst
 exmch' ps ns (C op)        (C op')          = if op == op' then Just emptySubst else Nothing
 
 exmch' ps ns (Forall xs (App (C Imp) (T[C (B True), e]))) (Forall xs' (App (C Imp) (T[C (B True), e'])))  = exmchq' ps ns xs e xs' e'
@@ -158,7 +160,7 @@ exmch' ps ns (Var x)       (Var x')         = if (x==x' && not (x `elem` ns)) ||
                                               else if (x `elem` ns) then Just [(x, Var x')] else Nothing
 exmch' ps ns (Var x)       e2               = if Var x == e2 && not (x `elem` ns) then Just emptySubst
                                               else if (x `elem` ns) then Just [(x, e2)] else Nothing
-exmch' ps ns _             _                = Nothing
+exmch' _  _  _             _                = Nothing
 
 exmchq' ps ns xs e xs' e' =
   let ps' = [(x,x') | (x,x')<-ps, not (x `elem` xs || x' `elem` xs')]

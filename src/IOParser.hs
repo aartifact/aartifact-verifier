@@ -19,7 +19,7 @@ import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import Data.List (partition, sort, isPrefixOf)
 import Data.Maybe (catMaybes, listToMaybe)
-import Ratio
+import Data.Ratio
 
 import IOParserOps
 import IOSource
