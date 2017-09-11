@@ -14,3 +14,21 @@ This repository has been posted for archival purposes. The work that involved th
 Subsequent publications describe later versions of the verification system inspired by the version in this repository:
 * Andrei Lapets, Richard Skowyra, Azer Bestavros, and Assaf Kfoury. [**Towards Accessible Integration and Deployment of Formal Tools and Techniques**](http://cs-people.bu.edu/lapets/resource/topi2013-integdep.pdf). Proceedings of TOPI 2013: The 3rd Workshop on Developing Tools as Plug-ins. San Francisco, CA, USA. May 2013.
 * Andrei Lapets. [**Accessible Integrated Formal Reasoning Environments in Classroom Instruction of Mathematics**](http://www.cs.bu.edu/techreports/pdf/2012-015-env-classroom-math.pdf). Proceedings of HCSS 2012: The High Confidence Software and Systems Conference. Annapolis, MD, USA. May 2012.
+
+## Building and installing
+
+Run the usual `cabal` command from the project's root directory:
+
+    % cabal install
+    
+## Running
+
+A number of example proof scripts can be found in the `examples` directory. They can be processed as is done with the example below:
+
+    % aartifact -ascii examples/test.txt
+    \vbeg
+    Introduce !!>$x$<!!.
+    Assume !!>$x = 5$<!!.
+    Assert !!>$x = 5$<!!.
+    Assert <<<$x = 6$>>>.
+    \vend

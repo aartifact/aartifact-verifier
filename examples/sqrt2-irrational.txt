@@ -1,7 +1,5 @@
-
-
 \vbeg
-Assert that for any $n, m \in \Z$,
+Assert for any $n, m \in \Z$,
 if $m \neq 0$ and \l{$n$ and $m$ are relatively prime} and $\sqrt{2} = n/m$ then
 :$m \cdot \sqrt{2} = m \cdot (n/m)$,
 :$m \cdot \sqrt{2} = n$,

@@ -22,7 +22,7 @@ module IOPrintFormat where
 type OutputFormat = [String -> String]
 
 noneOutFmt :: OutputFormat
-noneOutFmt = [id,id,id,id,id,id,id]
+noneOutFmt = [id,id,id,id,id,id,id,id]
 
 ansiOutFmt :: OutputFormat
 ansiOutFmt =
@@ -30,9 +30,22 @@ ansiOutFmt =
   , id
   , \s-> "\ESC[32m"++s
   , \s-> s++"\ESC[0m"
+  , \s-> "\ESC[32m"++s++"\ESC[0m" --valid
   , \s-> "\ESC[36m"++s++"\ESC[0m" --invalid
   , \s-> "\ESC[36m"++s++"\ESC[0m" --contradiction
-  , \s-> "\ESC[31m"++s++"\ESC[0m"
+  , \s-> "\ESC[31m"++s++"\ESC[0m" --syntax
+  ]
+
+asciiOutFmt :: OutputFormat
+asciiOutFmt =
+  [ id
+  , id
+  , \s-> ""++s
+  , \s-> s++""
+  , \s-> "!!>"++s++"<!!" --valid
+  , \s-> "<<<"++s++">>>" --invalid
+  , \s-> ">>>"++s++"<<<" --contradiction
+  , \s-> "??>"++s++"<??" --syntax
   ]
 
 cmdHtmlOutFmt :: OutputFormat

@@ -1,0 +1,6 @@
+\vbeg
+Introduce $x$.
+Assume $x = 5$.
+Assert $x = 5$.
+Assert $x = 6$.
+\vend

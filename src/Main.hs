@@ -140,13 +140,14 @@ cmd sy pr _    fls out ("-o":f       :args)    = cmd sy pr htmlOutFmt fls (File 
 cmd sy pr _    fls out ("-html"      :args)    = cmd sy pr htmlOutFmt fls out args
 cmd sy pr _    fls out ("-cmdhtml"   :args)    = cmd sy pr cmdHtmlOutFmt fls out args
 cmd sy pr _    fls out ("-ansi"      :args)    = cmd sy pr ansiOutFmt fls out args
+cmd sy pr _    fls out ("-ascii"      :args)   = cmd sy pr asciiOutFmt fls out args
 cmd _  pr oFmt fls out ("-system"    :sy:args) = cmd sy pr oFmt fls out args
 cmd sy _  oFmt fls out ("-procedure" :pr:args) = cmd sy pr oFmt fls out args
 cmd sy pr  oFmt [lit,stat,_] out [s] =
   if lit then processSys sy pr oFmt out stat "" s
   else do {t<-readFile s; processSys sy pr oFmt out stat s t}
 cmd _ _ _ _ _ _ = putStr $ showStmt noneOutFmt $ SystemError 
-                "usage:\taa [-html|-ansi] \"path/file.ext\"\n\n"
+                "usage:\taartifact [-html|-ansi|-ascii] \"path/file.ext\"\n\n"
 
 ----------------------------------------------------------------
 -- | The main function, useful if the interpreter is compiled.
