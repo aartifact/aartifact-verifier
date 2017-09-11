@@ -3,7 +3,7 @@
 ## aartifact
 ## http://www.aartifact.org/
 ##
-## src/aa.pl
+## aa.pl
 ##
 ##   Perl wrapper script that can be useful if ANSI color codes
 ##   are not displayed properly by the console or environment.
