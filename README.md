@@ -19,13 +19,16 @@ Subsequent publications describe later versions of the verification system inspi
 
 Run the usual `cabal` command from the project's root directory:
 
-    % cabal install
+    cabal install
     
 ## Running
 
 A number of example proof scripts can be found in the `examples` directory. They can be processed as is done with the example below:
 
-    % aartifact -ascii examples/test.txt
+    aartifact -ascii examples/test.txt
+    
+The ASCII output should look as follows:
+
     \vbeg
     Introduce !!>$x$<!!.
     Assume !!>$x = 5$<!!.
